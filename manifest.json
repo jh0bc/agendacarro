@@ -1,6 +1,6 @@
 {
-  "name": "AgendaCarro",
-  "short_name": "AgendaCarro",
+  "name": "Agenda Carro",
+  "short_name": "Agenda Carro",
   "description": "Gestão de abastecimentos, consumo e paridade de combustível",
   "start_url": "./index.html",
   "scope": "./",
