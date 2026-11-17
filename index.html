@@ -616,9 +616,10 @@
             <datalist id="postosList"></datalist>
           </div>
           <div class="flex flex-col gap-2 pt-1 sm:pt-5">
-            <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-medium cursor-pointer">
+            <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-medium cursor-pointer flex-wrap">
               <input id="fuelFull" type="checkbox" class="w-4 h-4 text-sky-600 rounded border-slate-300" />
               <span>Tanque cheio</span>
+              <span id="fuelCyclePreview" class="hidden text-xs font-semibold text-sky-600"></span>
             </label>
             <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-medium cursor-pointer">
               <input id="fuelAditivo" type="checkbox" class="w-4 h-4 text-sky-600 rounded border-slate-300" />
@@ -1800,6 +1801,51 @@
         .reduce((max, r) => Math.max(max, r.km), 0);
     }
 
+    function updateFuelCyclePreview() {
+      const el = document.getElementById('fuelCyclePreview');
+      if (!document.getElementById('fuelFull').checked) {
+        el.classList.add('hidden');
+        el.textContent = '';
+        return;
+      }
+      const existingId = document.getElementById('fuelId').value || null;
+      const placa = document.getElementById('fuelPlaca').value;
+      const curKm = parseInt(document.getElementById('fuelKm').value, 10) || 0;
+      const curLitros = parseFloat(document.getElementById('fuelLitros').value) || 0;
+      if (!(curKm > 0) || !(curLitros > 0)) {
+        el.classList.add('hidden');
+        el.textContent = '';
+        return;
+      }
+      const prevList = state.abastecimentos
+        .filter(r => r.placa === placa && r.id !== existingId && r.km < curKm)
+        .sort((a, b) => a.km - b.km || a.data.localeCompare(b.data));
+
+      let lastFullIdx = -1;
+      for (let i = prevList.length - 1; i >= 0; i--) {
+        if (prevList[i].tanqueCheio) { lastFullIdx = i; break; }
+      }
+      if (lastFullIdx < 0) {
+        el.classList.add('hidden');
+        el.textContent = '';
+        return;
+      }
+      const kmDiff = curKm - prevList[lastFullIdx].km;
+      let partialLitros = 0;
+      for (let i = lastFullIdx + 1; i < prevList.length; i++) {
+        partialLitros += Number(prevList[i].litros || 0);
+      }
+      const totalLitros = curLitros + partialLitros;
+      if (kmDiff > 0 && totalLitros > 0) {
+        const kmL = kmDiff / totalLitros;
+        el.textContent = `• ${fmtNum(kmL, 2)} km/L`;
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+        el.textContent = '';
+      }
+    }
+
     // Modal Fuel
     function openFuelModal(record = null) {
       const modal = document.getElementById('modalFuel');
@@ -1870,6 +1916,7 @@
         delBtn.classList.add('hidden');
         editedOrder = [];
       }
+      updateFuelCyclePreview();
       modal.classList.remove('hidden');
     }
 
@@ -1910,6 +1957,7 @@
         els.litros.value = (total / unit).toFixed(3);
       }
       syncSingleOrAutoPay();
+      updateFuelCyclePreview();
     }
 
     document.getElementById('fuelTotal').addEventListener('input', () => handleFuelMathInput('total'));
@@ -1921,7 +1969,10 @@
         const lastKm = getLastKmForPlate(document.getElementById('fuelPlaca').value);
         document.getElementById('fuelKmHint').textContent = lastKm ? `Último km registrado: ${lastKm.toLocaleString('pt-BR')} km` : '';
       }
+      updateFuelCyclePreview();
     });
+    document.getElementById('fuelKm').addEventListener('input', updateFuelCyclePreview);
+    document.getElementById('fuelFull').addEventListener('change', updateFuelCyclePreview);
 
     document.getElementById('formFuel').addEventListener('submit', (e) => {
       e.preventDefault();
