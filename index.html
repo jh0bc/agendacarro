@@ -896,6 +896,9 @@
 
     function applyServerData(serverData) {
       state = ensureProfiles(serverData || { veiculos: [], abastecimentos: [] });
+      state.abastecimentos.forEach(r => {
+        if (r.valorUnitario > 100) r.valorUnitario = Number((r.valorUnitario / 1000).toFixed(2));
+      });
       saveState();
       populateVehicleSelects();
       populatePostoOptions();
@@ -927,6 +930,9 @@
         if (saved) {
           const parsed = JSON.parse(saved);
           if (parsed && Array.isArray(parsed.abastecimentos) && Array.isArray(parsed.veiculos)) {
+            parsed.abastecimentos.forEach(r => {
+              if (r.valorUnitario > 100) r.valorUnitario = Number((r.valorUnitario / 1000).toFixed(2));
+            });
             return ensureProfiles(parsed);
           }
         }
