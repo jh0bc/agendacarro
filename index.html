@@ -78,6 +78,7 @@
             <div class="flex items-center gap-2">
               <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Agenda Carro</h1>
             </div>
+            <p class="text-xs text-slate-500">Conectado aos dados da planilha</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -166,9 +167,10 @@
           <p id="kpiTotalKm" class="text-xs text-slate-500 mt-1">Distância: -- km</p>
         </div>
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <p class="text-xs font-medium text-slate-500">Total Gasto</p>
+          <p class="text-xs font-medium text-slate-500">Total Abastecido</p>
           <p id="kpiTotalSpent" class="text-2xl font-bold text-slate-900 mt-1">R$ --</p>
-          <p id="kpiTotalLiters" class="text-xs text-slate-500 mt-1">-- L em -- abastec.</p>
+          <p id="kpiDoBolso" class="text-xs font-semibold text-indigo-600 mt-1">Do bolso: R$ --</p>
+          <p id="kpiTotalLiters" class="text-xs text-slate-500 mt-0.5">-- L em -- abastec.</p>
         </div>
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
           <div>
@@ -206,6 +208,44 @@
         </div>
       </div>
 
+      <!-- Financial Breakdown -->
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <h2 class="text-sm font-semibold text-slate-900">Origem dos Pagamentos e Economias</h2>
+          <span class="text-[11px] text-slate-500">Resumo do período selecionado</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 text-xs">
+          <div class="p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-200">
+            <p class="text-indigo-700 font-medium">Efetivo (Do Bolso)</p>
+            <p id="finDoBolso" class="text-sm font-bold text-indigo-700 mt-0.5">R$ --</p>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <p class="text-slate-500">Crédito</p>
+            <p id="finCredito" class="text-sm font-bold text-slate-900 mt-0.5">R$ --</p>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <p class="text-slate-500">Débito</p>
+            <p id="finDebito" class="text-sm font-bold text-slate-900 mt-0.5">R$ --</p>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <p class="text-slate-500">Pix</p>
+            <p id="finPix" class="text-sm font-bold text-slate-900 mt-0.5">R$ --</p>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <p class="text-slate-500">Cartão iFood</p>
+            <p id="finIfood" class="text-sm font-bold text-slate-900 mt-0.5">R$ --</p>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <p class="text-slate-500">Gift Card</p>
+            <p id="finGift" class="text-sm font-bold text-emerald-700 mt-0.5">R$ --</p>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <p class="text-slate-500">Desconto App + Cashback</p>
+            <p id="finDesc" class="text-sm font-bold text-amber-700 mt-0.5">R$ --</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
@@ -236,11 +276,12 @@
           <div class="relative h-64">
             <canvas id="chartMonthlySpent"></canvas>
           </div>
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 pt-3 max-w-sm mx-auto text-xs text-slate-600">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1.5 pt-3 max-w-md mx-auto text-xs text-slate-600">
             <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-emerald-500 shrink-0"></span>Etanol (R$)</span>
-            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-teal-600 shrink-0"></span>Etanol Aditivado (R$)</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-teal-600 shrink-0"></span>Etanol Adit. (R$)</span>
             <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-amber-500 shrink-0"></span>Gasolina (R$)</span>
-            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-orange-600 shrink-0"></span>Gasolina Aditivada (R$)</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-orange-600 shrink-0"></span>Gasolina Adit. (R$)</span>
+            <span class="inline-flex items-center gap-1.5 col-span-2 sm:col-span-1"><span class="w-3 h-0.5 bg-indigo-600 shrink-0"></span>Do Bolso (R$)</span>
           </div>
         </div>
       </div>
@@ -458,6 +499,12 @@
             </select>
           </div>
           <div>
+            <label for="filterPosto" class="block text-[11px] font-medium text-slate-500 mb-1">Posto</label>
+            <select id="filterPosto" class="w-full text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5">
+              <option value="all">Todos</option>
+            </select>
+          </div>
+          <div>
             <button id="btnClearFuelFilters" type="button" class="w-full text-xs sm:text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition">
               Limpar critérios
             </button>
@@ -475,6 +522,7 @@
             <thead>
               <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
                 <th class="py-2.5 px-3">Data</th>
+                <th class="py-2.5 px-3">Posto</th>
                 <th class="py-2.5 px-3">Combustível</th>
                 <th class="py-2.5 px-3 text-right">Odômetro</th>
                 <th class="py-2.5 px-3 text-right">Litros</th>
@@ -546,7 +594,7 @@
         </div>
         <div class="grid grid-cols-3 gap-3">
           <div>
-            <label for="fuelTotal" class="block text-xs font-medium text-slate-600 mb-1">Valor Total (R$)</label>
+            <label for="fuelTotal" class="block text-xs font-medium text-slate-600 mb-1">Valor Bomba (R$)</label>
             <input id="fuelTotal" type="number" step="0.01" min="0.01" required class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5" />
           </div>
           <div>
@@ -560,13 +608,71 @@
         </div>
         <p id="fuelValueError" class="hidden text-xs font-semibold text-rose-600"></p>
         <p class="text-[11px] text-slate-400">Preencha dois valores (ex: Total + Litros, ou Litros + Valor/L) que o terceiro é calculado automaticamente.</p>
-        <div class="flex items-center gap-2 pt-1">
-          <input id="fuelFull" type="checkbox" class="w-4 h-4 text-indigo-600 rounded border-slate-300" />
-          <label for="fuelFull" class="text-sm text-slate-700 font-medium">Tanque cheio (usado para cálculo de km/L)</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 items-start">
+          <div>
+            <label for="fuelPosto" class="block text-xs font-medium text-slate-600 mb-1">Posto / Local</label>
+            <input id="fuelPosto" type="text" list="postosList" placeholder="Ex: Posto Carrefour" class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5" />
+            <datalist id="postosList"></datalist>
+          </div>
+          <div class="flex flex-col gap-2 pt-1 sm:pt-5">
+            <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-medium cursor-pointer">
+              <input id="fuelFull" type="checkbox" class="w-4 h-4 text-indigo-600 rounded border-slate-300" />
+              <span>Tanque cheio</span>
+            </label>
+            <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-medium cursor-pointer">
+              <input id="fuelAditivo" type="checkbox" class="w-4 h-4 text-indigo-600 rounded border-slate-300" />
+              <span>Aplicado aditivo</span>
+            </label>
+          </div>
         </div>
+
+        <div id="fuelAditivoQualWrap" class="hidden">
+          <label for="fuelAditivoQual" class="block text-xs font-medium text-slate-600 mb-1">Qual aditivo?</label>
+          <input id="fuelAditivoQual" type="text" list="aditivosList" placeholder="Ex: ACDelco Flex" class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5" />
+          <datalist id="aditivosList"></datalist>
+        </div>
+
+        <!-- Descontos (Opcional) -->
+        <div class="rounded-xl bg-slate-50 border border-slate-200 p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-semibold text-slate-700">Descontos / Cashback</p>
+            <span class="text-[10px] text-slate-400">Opcional</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label for="fuelDescApp" class="block text-[11px] text-slate-500 mb-0.5">Desconto App / Cupom (R$)</label>
+              <input id="fuelDescApp" type="number" step="0.01" min="0" placeholder="0.00" class="w-full text-sm rounded-lg border border-slate-300 px-2 py-1" />
+            </div>
+            <div>
+              <label for="fuelCashback" class="block text-[11px] text-slate-500 mb-0.5">Cashback (R$)</label>
+              <input id="fuelCashback" type="number" step="0.01" min="0" placeholder="0.00" class="w-full text-sm rounded-lg border border-slate-300 px-2 py-1" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Formas de Pagamento (Obrigatório) -->
+        <div class="rounded-xl bg-slate-50 border border-slate-200 p-3 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p class="text-xs font-semibold text-slate-700">Formas de Pagamento <span class="text-rose-600">*</span></p>
+              <p class="text-[11px] text-slate-500">Total a pagar (após descontos): <strong id="fuelNetToPayLabel" class="text-slate-900">R$ 0,00</strong></p>
+            </div>
+            <span id="fuelPagStatus" class="text-[11px] font-medium text-slate-500">Selecione ao menos 1</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5" id="payMethodChips">
+            <button type="button" data-pay="Credito" class="pay-chip px-2.5 py-1 rounded-full text-xs font-medium border border-slate-300 bg-white text-slate-700 transition">Crédito</button>
+            <button type="button" data-pay="Debito" class="pay-chip px-2.5 py-1 rounded-full text-xs font-medium border border-slate-300 bg-white text-slate-700 transition">Débito</button>
+            <button type="button" data-pay="Pix" class="pay-chip px-2.5 py-1 rounded-full text-xs font-medium border border-slate-300 bg-white text-slate-700 transition">Pix</button>
+            <button type="button" data-pay="Ifood" class="pay-chip px-2.5 py-1 rounded-full text-xs font-medium border border-slate-300 bg-white text-slate-700 transition">iFood</button>
+            <button type="button" data-pay="Gift" class="pay-chip px-2.5 py-1 rounded-full text-xs font-medium border border-slate-300 bg-white text-slate-700 transition">Gift Card</button>
+          </div>
+          <div id="payInputsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+          <p id="fuelPagError" class="hidden text-xs font-semibold text-rose-600"></p>
+        </div>
+
         <div>
-          <label for="fuelNotes" class="block text-xs font-medium text-slate-600 mb-1">Anotações (Posto, descontos, pagamentos)</label>
-          <textarea id="fuelNotes" rows="3" placeholder="Ex: Posto Carrefour&#10;Desconto App = R$ 2,50&#10;Cartão de Crédito = R$ ..." class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5"></textarea>
+          <label for="fuelNotes" class="block text-xs font-medium text-slate-600 mb-1">Anotações extras (ocorrências)</label>
+          <textarea id="fuelNotes" rows="2" placeholder="Observações pontuais..." class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5"></textarea>
         </div>
         <div class="flex items-center justify-between pt-2 border-t border-slate-100">
           <button type="button" id="btnDeleteFuel" class="hidden text-xs font-semibold px-3 py-2 rounded-lg text-rose-600 hover:bg-rose-50 transition">
@@ -674,7 +780,7 @@
 
   <script>
     const INITIAL_DATA = { veiculos: [], abastecimentos: [] };
-    const STORAGE_KEY = 'agendacarro_proto_v3';
+    const STORAGE_KEY = 'agendacarro_pwa_cache_v1';
     const THEME_KEY = 'agendacarro_theme';
     let themeMode = 'system';
     try { themeMode = localStorage.getItem(THEME_KEY) || 'system'; } catch (e) {}
@@ -792,6 +898,7 @@
       state = ensureProfiles(serverData || { veiculos: [], abastecimentos: [] });
       saveState();
       populateVehicleSelects();
+      populatePostoOptions();
       updateBadges();
       syncPeriodDatesFromShortcut();
       renderDashboard();
@@ -934,6 +1041,113 @@
 
     }
 
+    const PAY_METHODS = [
+      { key: 'Credito', field: 'pagCredito', label: 'Crédito (R$)' },
+      { key: 'Debito', field: 'pagDebito', label: 'Débito (R$)' },
+      { key: 'Pix', field: 'pagPix', label: 'Pix (R$)' },
+      { key: 'Ifood', field: 'pagIfood', label: 'iFood (R$)' },
+      { key: 'Gift', field: 'pagGift', label: 'Gift Card (R$)' }
+    ];
+    let selectedPayMethods = new Set();
+    let payValues = { Credito: '', Debito: '', Pix: '', Ifood: '', Gift: '' };
+
+    function getNetToPay() {
+      const bomba = parseFloat(document.getElementById('fuelTotal').value) || 0;
+      const desc = parseFloat(document.getElementById('fuelDescApp').value) || 0;
+      const cash = parseFloat(document.getElementById('fuelCashback').value) || 0;
+      return Math.max(0, Number((bomba - desc - cash).toFixed(2)));
+    }
+
+    function syncSingleOrAutoPay() {
+      const net = getNetToPay();
+      document.getElementById('fuelNetToPayLabel').textContent = fmtBRL(net);
+      if (selectedPayMethods.size === 1 && net > 0) {
+        const onlyKey = [...selectedPayMethods][0];
+        payValues[onlyKey] = net.toFixed(2);
+        const inp = document.getElementById(`payInp_${onlyKey}`);
+        if (inp) inp.value = payValues[onlyKey];
+      }
+      updatePayStatus();
+    }
+
+    function renderPayMethodInputs() {
+      document.querySelectorAll('.pay-chip').forEach(btn => {
+        const active = selectedPayMethods.has(btn.dataset.pay);
+        btn.className = active
+          ? 'pay-chip px-2.5 py-1 rounded-full text-xs font-semibold border border-indigo-600 bg-indigo-600 text-white transition'
+          : 'pay-chip px-2.5 py-1 rounded-full text-xs font-medium border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition';
+      });
+
+      const cont = document.getElementById('payInputsContainer');
+      cont.innerHTML = '';
+      for (const m of PAY_METHODS) {
+        if (!selectedPayMethods.has(m.key)) continue;
+        const wrap = document.createElement('div');
+        wrap.innerHTML = `
+          <label for="payInp_${m.key}" class="block text-[11px] text-slate-500 mb-0.5">${m.label}</label>
+          <input id="payInp_${m.key}" type="number" step="0.01" min="0.01" value="${payValues[m.key] !== '' ? payValues[m.key] : ''}" placeholder="0.00" class="w-full text-sm rounded-lg border border-slate-300 px-2 py-1" />
+        `;
+        wrap.querySelector('input').addEventListener('input', (e) => {
+          payValues[m.key] = e.target.value;
+          const net = getNetToPay();
+          const editedVal = parseFloat(e.target.value) || 0;
+          if (selectedPayMethods.size === 2 && net > 0) {
+            const otherKey = [...selectedPayMethods].find(k => k !== m.key);
+            if (otherKey) {
+              const rem = Math.max(0, Number((net - editedVal).toFixed(2)));
+              payValues[otherKey] = rem > 0 ? rem.toFixed(2) : '';
+              const otherInp = document.getElementById(`payInp_${otherKey}`);
+              if (otherInp) otherInp.value = payValues[otherKey];
+            }
+          }
+          updatePayStatus();
+        });
+        cont.appendChild(wrap);
+      }
+      updatePayStatus();
+    }
+
+    function updatePayStatus() {
+      const net = getNetToPay();
+      document.getElementById('fuelNetToPayLabel').textContent = fmtBRL(net);
+      let sum = 0;
+      for (const m of PAY_METHODS) {
+        if (selectedPayMethods.has(m.key)) {
+          sum += parseFloat(payValues[m.key]) || 0;
+        }
+      }
+      const statusEl = document.getElementById('fuelPagStatus');
+      if (selectedPayMethods.size === 0) {
+        statusEl.textContent = 'Selecione ao menos 1';
+        statusEl.className = 'text-[11px] font-medium text-slate-500';
+      } else if (net > 0 && Math.abs(sum - net) <= 0.02) {
+        statusEl.textContent = `Coberto (${fmtBRL(sum)})`;
+        statusEl.className = 'text-[11px] font-semibold text-emerald-600';
+      } else if (net > 0) {
+        const diff = net - sum;
+        statusEl.textContent = diff > 0 ? `Falta ${fmtBRL(diff)}` : `Excede ${fmtBRL(Math.abs(diff))}`;
+        statusEl.className = 'text-[11px] font-semibold text-amber-600';
+      } else {
+        statusEl.textContent = `Soma: ${fmtBRL(sum)}`;
+        statusEl.className = 'text-[11px] font-medium text-slate-500';
+      }
+    }
+
+    function populatePostoOptions() {
+      const postos = [...new Set(state.abastecimentos.map(r => (r.posto || '').trim()).filter(Boolean))].sort();
+      const dl = document.getElementById('postosList');
+      if (dl) dl.innerHTML = postos.map(p => `<option value="${escapeHtml(p)}"></option>`).join('');
+      const sel = document.getElementById('filterPosto');
+      if (sel) {
+        const prev = sel.value;
+        sel.innerHTML = '<option value="all">Todos</option>' + postos.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
+        if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+      }
+      const aditivos = [...new Set(state.abastecimentos.map(r => (r.aditivoQual || '').trim()).filter(Boolean))].sort();
+      const adDl = document.getElementById('aditivosList');
+      if (adDl) adDl.innerHTML = aditivos.map(a => `<option value="${escapeHtml(a)}"></option>`).join('');
+    }
+
     function updateBadges() {
       document.getElementById('badgeAbast').textContent = state.abastecimentos.length;
       document.getElementById('badgeVeic').textContent = state.veiculos.length;
@@ -1064,6 +1278,19 @@
       document.getElementById('compGasPrice').textContent = gasAvgPrice ? `${fmtBRL(gasAvgPrice)}/L` : '--';
       document.getElementById('compGasCostKm').textContent = (gasAvgKmL && gasAvgPrice) ? fmtBRL(gasAvgPrice / gasAvgKmL) : 'R$ --';
 
+      const sCred = records.reduce((a, r) => a + Number(r.pagCredito || 0), 0);
+      const sDeb = records.reduce((a, r) => a + Number(r.pagDebito || 0), 0);
+      const sPix = records.reduce((a, r) => a + Number(r.pagPix || 0), 0);
+      const sDoBolso = sCred + sDeb + sPix;
+      document.getElementById('kpiDoBolso').textContent = `Do bolso (Créd/Déb/Pix): ${fmtBRL(sDoBolso)}`;
+      document.getElementById('finDoBolso').textContent = fmtBRL(sDoBolso);
+      document.getElementById('finCredito').textContent = fmtBRL(sCred);
+      document.getElementById('finDebito').textContent = fmtBRL(sDeb);
+      document.getElementById('finPix').textContent = fmtBRL(sPix);
+      document.getElementById('finIfood').textContent = fmtBRL(records.reduce((a, r) => a + Number(r.pagIfood || 0), 0));
+      document.getElementById('finGift').textContent = fmtBRL(records.reduce((a, r) => a + Number(r.pagGift || 0), 0));
+      document.getElementById('finDesc').textContent = fmtBRL(records.reduce((a, r) => a + Number(r.descontoApp || 0) + Number(r.cashback || 0), 0));
+
       renderCharts(records, validSegments);
     }
 
@@ -1124,10 +1351,11 @@
       for (const r of records) {
         const ym = r.data.slice(0, 7);
         if (!monthMap.has(ym)) {
-          monthMap.set(ym, { 'Etanol': 0, 'Etanol Aditivado': 0, 'Gasolina': 0, 'Gasolina Aditivada': 0 });
+          monthMap.set(ym, { 'Etanol': 0, 'Etanol Aditivado': 0, 'Gasolina': 0, 'Gasolina Aditivada': 0, doBolso: 0 });
         }
         const key = monthMap.get(ym)[r.combustivel] !== undefined ? r.combustivel : fuelFamily(r.combustivel);
         monthMap.get(ym)[key] += r.valorTotal;
+        monthMap.get(ym).doBolso += Number(r.pagCredito || 0) + Number(r.pagDebito || 0) + Number(r.pagPix || 0);
       }
       const mKeys = [...monthMap.keys()].sort();
       const mLabels = mKeys.map(k => `${k.slice(5)}/${k.slice(2, 4)}`);
@@ -1138,10 +1366,11 @@
         data: {
           labels: mLabels,
           datasets: [
-            { label: 'Etanol (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Etanol'].toFixed(2))), backgroundColor: '#10b981', borderRadius: 4 },
-            { label: 'Etanol Aditivado (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Etanol Aditivado'].toFixed(2))), backgroundColor: '#0d9488', borderRadius: 4 },
-            { label: 'Gasolina (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Gasolina'].toFixed(2))), backgroundColor: '#f59e0b', borderRadius: 4 },
-            { label: 'Gasolina Aditivada (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Gasolina Aditivada'].toFixed(2))), backgroundColor: '#ea580c', borderRadius: 4 }
+            { label: 'Do Bolso (R$)', type: 'line', data: mKeys.map(k => Number(monthMap.get(k).doBolso.toFixed(2))), borderColor: '#4f46e5', backgroundColor: '#4f46e5', borderWidth: 2.5, pointRadius: 3, tension: 0.25, order: 0 },
+            { label: 'Etanol (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Etanol'].toFixed(2))), backgroundColor: '#10b981', borderRadius: 4, maxBarThickness: 48, stack: 'fuel', order: 1 },
+            { label: 'Etanol Aditivado (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Etanol Aditivado'].toFixed(2))), backgroundColor: '#0d9488', borderRadius: 4, maxBarThickness: 48, stack: 'fuel', order: 1 },
+            { label: 'Gasolina (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Gasolina'].toFixed(2))), backgroundColor: '#f59e0b', borderRadius: 4, maxBarThickness: 48, stack: 'fuel', order: 1 },
+            { label: 'Gasolina Aditivada (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Gasolina Aditivada'].toFixed(2))), backgroundColor: '#ea580c', borderRadius: 4, maxBarThickness: 48, stack: 'fuel', order: 1 }
           ]
         },
         options: {
@@ -1154,8 +1383,8 @@
               callbacks: {
                 label: (ctx) => `${ctx.dataset.label}: ${fmtBRL(ctx.parsed.y)}`,
                 footer: (items) => {
-                  const sum = items.reduce((acc, it) => acc + (it.parsed.y || 0), 0);
-                  return `Total do mês: ${fmtBRL(sum)}`;
+                  const sum = items.filter(it => it.dataset.stack === 'fuel').reduce((acc, it) => acc + (it.parsed.y || 0), 0);
+                  return `Total abastecido: ${fmtBRL(sum)}`;
                 }
               }
             }
@@ -1345,6 +1574,7 @@
       if (document.getElementById('filterDateEnd').value) count++;
       if (document.getElementById('filterFuel').value !== 'all') count++;
       if (document.getElementById('filterFullTank').value !== 'all') count++;
+      if (document.getElementById('filterPosto').value !== 'all') count++;
       const badge = document.getElementById('activeFilterCount');
       badge.textContent = count;
       badge.classList.toggle('hidden', count === 0);
@@ -1357,12 +1587,14 @@
       const full = document.getElementById('filterFullTank').value;
       const dStart = document.getElementById('filterDateStart').value;
       const dEnd = document.getElementById('filterDateEnd').value;
+      const postoFilter = document.getElementById('filterPosto').value;
 
       const consMap = computeConsumptionMap(state.abastecimentos);
       const list = [...state.abastecimentos]
         .sort((a, b) => b.data.localeCompare(a.data) || b.km - a.km)
         .filter(r => {
           if (fuel !== 'all' && r.combustivel !== fuel) return false;
+          if (postoFilter !== 'all' && (r.posto || '') !== postoFilter) return false;
           if (full === 'Sim' && !r.tanqueCheio) return false;
           if (full === 'Não' && r.tanqueCheio) return false;
           if (dStart && r.data < dStart) return false;
@@ -1396,7 +1628,8 @@
         tr.addEventListener('click', () => openFuelModal(r));
         tr.innerHTML = `
           <td class="py-2.5 px-3 whitespace-nowrap font-medium text-slate-900">${fmtDateBR(r.data)}</td>
-          <td class="py-2.5 px-3 whitespace-nowrap"><span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${pillClass}">${r.combustivel}</span></td>
+          <td class="py-2.5 px-3 whitespace-nowrap text-slate-700">${escapeHtml(r.posto || '—')}</td>
+          <td class="py-2.5 px-3 whitespace-nowrap"><span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${pillClass}">${r.combustivel}</span>${r.aditivo ? ` <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-100 text-indigo-800">+Adit${r.aditivoQual ? ': ' + escapeHtml(r.aditivoQual) : ''}</span>` : ''}</td>
           <td class="py-2.5 px-3 text-right whitespace-nowrap">${r.km.toLocaleString('pt-BR')} km</td>
           <td class="py-2.5 px-3 text-right whitespace-nowrap">${fmtNum(r.litros, 3)} L</td>
           <td class="py-2.5 px-3 text-right whitespace-nowrap">${fmtNum(r.valorUnitario, 2)}</td>
@@ -1415,6 +1648,7 @@
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${pillClass}">${r.combustivel}</span>
+              ${r.aditivo ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-100 text-indigo-800">+Adit${r.aditivoQual ? ': ' + escapeHtml(r.aditivoQual) : ''}</span>` : ''}
               <span class="text-xs font-medium text-slate-600">${fmtDateBR(r.data)}</span>
             </div>
             <span class="text-sm font-bold text-slate-900">${fmtBRL(r.valorTotal)}</span>
@@ -1433,7 +1667,7 @@
               <p class="font-bold ${seg ? 'text-indigo-700' : 'text-slate-400'}">${seg ? fmtNum(seg.kmL, 2) + ' km/L' : '—'}</p>
             </div>
           </div>
-          ${r.anotacoes ? `<p class="text-[11px] text-slate-500 truncate pt-1 border-t border-slate-100">${escapeHtml(snippet)}</p>` : ''}
+          ${(r.posto || r.pagIfood || r.pagGift || r.descontoApp || r.cashback) ? `<p class="text-[11px] text-slate-500 truncate pt-1 border-t border-slate-100">${r.posto ? '<strong>' + escapeHtml(r.posto) + '</strong>' : ''}${r.pagIfood ? ' • iFood ' + fmtBRL(r.pagIfood) : ''}${r.pagGift ? ' • Gift ' + fmtBRL(r.pagGift) : ''}${(r.descontoApp || r.cashback) ? ' • Desc ' + fmtBRL((r.descontoApp || 0) + (r.cashback || 0)) : ''}</p>` : ''}
         `;
         cardsEl.appendChild(card);
       }
@@ -1525,6 +1759,7 @@
       const valErr = document.getElementById('fuelValueError');
       kmErr.classList.add('hidden');
       valErr.classList.add('hidden');
+      document.getElementById('fuelPagError').classList.add('hidden');
 
       document.getElementById('modalFuelTitle').textContent = record ? 'Editar Abastecimento' : 'Novo Abastecimento';
 
@@ -1536,8 +1771,26 @@
         document.getElementById('fuelKm').value = record.km;
         document.getElementById('fuelUnit').value = Number(record.valorUnitario).toFixed(2);
         document.getElementById('fuelLitros').value = Number(record.litros).toFixed(3);
-        document.getElementById('fuelTotal').value = Number(record.valorTotal).toFixed(2);
+        const descSum = Number(record.descontoApp || 0) + Number(record.cashback || 0);
+        const bombaVal = record.valorBomba ? Number(record.valorBomba) : (Number(record.valorTotal) + descSum);
+        document.getElementById('fuelTotal').value = bombaVal.toFixed(2);
         document.getElementById('fuelFull').checked = !!record.tanqueCheio;
+        document.getElementById('fuelPosto').value = record.posto || '';
+        document.getElementById('fuelAditivo').checked = !!record.aditivo;
+        document.getElementById('fuelAditivoQualWrap').classList.toggle('hidden', !record.aditivo);
+        document.getElementById('fuelAditivoQual').value = record.aditivoQual || '';
+        document.getElementById('fuelDescApp').value = record.descontoApp || '';
+        document.getElementById('fuelCashback').value = record.cashback || '';
+        selectedPayMethods = new Set();
+        payValues = { Credito: '', Debito: '', Pix: '', Ifood: '', Gift: '' };
+        for (const m of PAY_METHODS) {
+          const val = Number(record[m.field] || 0);
+          if (val > 0) {
+            selectedPayMethods.add(m.key);
+            payValues[m.key] = val.toFixed(2);
+          }
+        }
+        renderPayMethodInputs();
         document.getElementById('fuelNotes').value = record.anotacoes || '';
         document.getElementById('fuelKmHint').textContent = '';
         delBtn.classList.remove('hidden');
@@ -1555,6 +1808,15 @@
         document.getElementById('fuelLitros').value = '';
         document.getElementById('fuelTotal').value = '';
         document.getElementById('fuelFull').checked = false;
+        document.getElementById('fuelPosto').value = '';
+        document.getElementById('fuelAditivo').checked = false;
+        document.getElementById('fuelAditivoQualWrap').classList.add('hidden');
+        document.getElementById('fuelAditivoQual').value = '';
+        document.getElementById('fuelDescApp').value = '';
+        document.getElementById('fuelCashback').value = '';
+        selectedPayMethods = new Set();
+        payValues = { Credito: '', Debito: '', Pix: '', Ifood: '', Gift: '' };
+        renderPayMethodInputs();
         document.getElementById('fuelNotes').value = '';
         delBtn.classList.add('hidden');
         editedOrder = [];
@@ -1598,6 +1860,7 @@
       } else if (pair.has('total') && pair.has('unit') && total > 0 && unit > 0) {
         els.litros.value = (total / unit).toFixed(3);
       }
+      syncSingleOrAutoPay();
     }
 
     document.getElementById('fuelTotal').addEventListener('input', () => handleFuelMathInput('total'));
@@ -1648,6 +1911,29 @@
         return;
       }
 
+      const pagErr = document.getElementById('fuelPagError');
+      pagErr.classList.add('hidden');
+      let sumPag = 0;
+      let activePaidCount = 0;
+      for (const m of PAY_METHODS) {
+        if (selectedPayMethods.has(m.key)) {
+          const v = parseFloat(payValues[m.key]) || 0;
+          if (v > 0) activePaidCount++;
+          sumPag += v;
+        }
+      }
+      if (activePaidCount === 0) {
+        pagErr.textContent = 'Selecione e preencha ao menos uma forma de pagamento.';
+        pagErr.classList.remove('hidden');
+        return;
+      }
+      const netToPay = getNetToPay();
+      if (Math.abs(sumPag - netToPay) > 0.02) {
+        pagErr.textContent = `A soma dos pagamentos (${fmtBRL(sumPag)}) deve ser igual ao Total a Pagar (${fmtBRL(netToPay)}).`;
+        pagErr.classList.remove('hidden');
+        return;
+      }
+
       const id = existingId || ('loc_' + Date.now().toString(36));
       const item = {
         id,
@@ -1657,8 +1943,19 @@
         km: kmVal,
         valorUnitario: Number(unitVal.toFixed(2)),
         litros: Number(litrosVal.toFixed(3)),
-        valorTotal: Number(totalVal.toFixed(2)),
+        valorBomba: Number(totalVal.toFixed(2)),
+        valorTotal: Number(netToPay.toFixed(2)),
         tanqueCheio: document.getElementById('fuelFull').checked,
+        posto: document.getElementById('fuelPosto').value.trim(),
+        aditivo: document.getElementById('fuelAditivo').checked,
+        aditivoQual: document.getElementById('fuelAditivo').checked ? document.getElementById('fuelAditivoQual').value.trim() : '',
+        descontoApp: parseFloat(document.getElementById('fuelDescApp').value) || 0,
+        cashback: parseFloat(document.getElementById('fuelCashback').value) || 0,
+        pagCredito: selectedPayMethods.has('Credito') ? (parseFloat(payValues.Credito) || 0) : 0,
+        pagDebito: selectedPayMethods.has('Debito') ? (parseFloat(payValues.Debito) || 0) : 0,
+        pagPix: selectedPayMethods.has('Pix') ? (parseFloat(payValues.Pix) || 0) : 0,
+        pagIfood: selectedPayMethods.has('Ifood') ? (parseFloat(payValues.Ifood) || 0) : 0,
+        pagGift: selectedPayMethods.has('Gift') ? (parseFloat(payValues.Gift) || 0) : 0,
         anotacoes: document.getElementById('fuelNotes').value.trim()
       };
       if (isAppsScript()) {
@@ -1681,6 +1978,7 @@
         showToast('Abastecimento adicionado!');
       }
       saveState();
+      populatePostoOptions();
       updateBadges();
       closeFuelModal();
       syncPeriodDatesFromShortcut();
@@ -1704,6 +2002,7 @@
       }
       state.abastecimentos = state.abastecimentos.filter(r => r.id !== id);
       saveState();
+      populatePostoOptions();
       updateBadges();
       closeFuelModal();
       renderDashboard();
@@ -1746,6 +2045,7 @@
       });
       saveState();
       populateVehicleSelects();
+    populatePostoOptions();
       updateBadges();
       document.getElementById('modalVehicle').classList.add('hidden');
       e.target.reset();
@@ -1789,7 +2089,6 @@
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
 
-    // Refresh data from Google Sheets
     document.getElementById('btnRefreshData').addEventListener('click', loadFromSheet);
 
     // Wire events
@@ -1840,12 +2139,42 @@
     document.getElementById('filterDateEnd').addEventListener('change', renderFuelTable);
     document.getElementById('filterFuel').addEventListener('change', renderFuelTable);
     document.getElementById('filterFullTank').addEventListener('change', renderFuelTable);
+    document.getElementById('filterPosto').addEventListener('change', renderFuelTable);
+    document.getElementById('fuelDescApp').addEventListener('input', syncSingleOrAutoPay);
+    document.getElementById('fuelCashback').addEventListener('input', syncSingleOrAutoPay);
+    document.getElementById('fuelAditivo').addEventListener('change', (e) => {
+      const wrap = document.getElementById('fuelAditivoQualWrap');
+      wrap.classList.toggle('hidden', !e.target.checked);
+      if (!e.target.checked) document.getElementById('fuelAditivoQual').value = '';
+    });
+    document.querySelectorAll('.pay-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.pay;
+        if (selectedPayMethods.has(key)) {
+          selectedPayMethods.delete(key);
+          payValues[key] = '';
+        } else {
+          selectedPayMethods.add(key);
+          const tot = getNetToPay();
+          if (selectedPayMethods.size === 1 && tot > 0) {
+            payValues[key] = tot.toFixed(2);
+          } else if (tot > 0) {
+            let otherSum = 0;
+            selectedPayMethods.forEach(k => { if (k !== key) otherSum += parseFloat(payValues[k]) || 0; });
+            const rem = tot - otherSum;
+            if (rem > 0) payValues[key] = rem.toFixed(2);
+          }
+        }
+        renderPayMethodInputs();
+      });
+    });
     document.getElementById('btnClearFuelFilters').addEventListener('click', () => {
       document.getElementById('filterSearch').value = '';
       document.getElementById('filterDateStart').value = '';
       document.getElementById('filterDateEnd').value = '';
       document.getElementById('filterFuel').value = 'all';
       document.getElementById('filterFullTank').value = 'all';
+      document.getElementById('filterPosto').value = 'all';
       renderFuelTable();
     });
 
@@ -1897,6 +2226,7 @@
     // Init
     applyTheme(false);
     populateVehicleSelects();
+    populatePostoOptions();
     updateBadges();
     syncPeriodDatesFromShortcut();
     renderDashboard();
