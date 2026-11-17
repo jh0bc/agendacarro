@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgendaCarro — Gestão de Veículo e Abastecimentos</title>
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/png" href="./icon-192.png" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .tab-btn[aria-selected="true"] {
+      color: #4f46e5;
+      border-bottom-color: #4f46e5;
+      background-color: #eef2ff;
+    }
+    @media (min-width: 640px) {
+      .tab-btn[aria-selected="true"] {
+        background-color: transparent;
+      }
+    }
+    html.dark body { background-color: #0f172a; color: #e2e8f0; }
+    html.dark .bg-white { background-color: #1e293b !important; }
+    html.dark .bg-slate-50 { background-color: #0f172a !important; }
+    html.dark .bg-slate-100 { background-color: #334155 !important; }
+    html.dark .bg-emerald-50\/70 { background-color: rgba(6, 78, 59, 0.35) !important; }
+    html.dark .bg-amber-50\/70 { background-color: rgba(120, 53, 15, 0.35) !important; }
+    html.dark .bg-indigo-50\/70 { background-color: rgba(49, 46, 129, 0.45) !important; }
+    html.dark .border-slate-200,
+    html.dark .border-slate-300,
+    html.dark .border-slate-100 { border-color: #334155 !important; }
+    html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #334155 !important; }
+    html.dark .border-emerald-200 { border-color: #065f46 !important; }
+    html.dark .border-amber-200 { border-color: #92400e !important; }
+    html.dark .text-slate-900 { color: #f8fafc !important; }
+    html.dark .text-slate-800 { color: #e2e8f0 !important; }
+    html.dark .text-slate-700 { color: #cbd5e1 !important; }
+    html.dark .text-slate-600 { color: #94a3b8 !important; }
+    html.dark .text-slate-500 { color: #94a3b8 !important; }
+    html.dark .text-slate-400 { color: #64748b !important; }
+    html.dark .text-indigo-600 { color: #818cf8 !important; }
+    html.dark .text-indigo-700 { color: #a5b4fc !important; }
+    html.dark .text-emerald-700 { color: #34d399 !important; }
+    html.dark .text-amber-700 { color: #fbbf24 !important; }
+    html.dark input,
+    html.dark select,
+    html.dark textarea {
+      background-color: #0f172a !important;
+      color: #f1f5f9 !important;
+      border-color: #475569 !important;
+    }
+    html.dark .tab-btn[aria-selected="true"] {
+      color: #a5b4fc;
+      border-bottom-color: #818cf8;
+    }
+    html.dark .hover\:bg-slate-100:hover,
+    html.dark .hover\:bg-slate-50:hover { background-color: #334155 !important; }
+    html.dark .hover\:bg-indigo-50\/50:hover { background-color: rgba(79, 70, 229, 0.18) !important; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="flex flex-wrap items-center justify-between gap-2 py-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            A
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">AgendaCarro</h1>
+              <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">PWA</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnApiConfig" type="button" class="text-xs font-medium px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition" title="Configurar URL da API e Token">
+            Conexão
+          </button>
+          <button id="btnThemeToggle" type="button" class="text-xs font-medium px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition" title="Alternar tema (Auto / Escuro / Claro)">
+            Tema: Auto
+          </button>
+          <button id="btnRefreshData" type="button" class="text-xs font-medium px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition" title="Recarregar dados da planilha">
+            Atualizar
+          </button>
+          <button id="btnQuickAdd" type="button" class="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-sm">
+            + Abastecimento
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden sm:flex overflow-x-auto -mb-px gap-4" role="tablist" aria-label="Navegação principal">
+        <button type="button" class="tab-btn whitespace-nowrap px-3 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition rounded-t-lg" data-tab="dashboard" aria-selected="true" role="tab">
+          Dashboard
+        </button>
+        <button type="button" class="tab-btn whitespace-nowrap px-3 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition rounded-t-lg" data-tab="calculadora" aria-selected="false" role="tab">
+          Calculadora / Paridade
+        </button>
+        <button type="button" class="tab-btn whitespace-nowrap px-3 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition rounded-t-lg" data-tab="abastecimentos" aria-selected="false" role="tab">
+          Abastecimentos <span id="badgeAbast" class="ml-1 text-[11px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-700">0</span>
+        </button>
+        <button type="button" class="tab-btn whitespace-nowrap px-3 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition rounded-t-lg" data-tab="veiculos" aria-selected="false" role="tab">
+          Veículos <span id="badgeVeic" class="ml-1 text-[11px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-700">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-5 pb-24 sm:pb-6 space-y-5">
+
+    <!-- TAB: DASHBOARD -->
+    <section id="tab-dashboard" class="space-y-5">
+      <!-- Filters bar -->
+      <div class="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 flex flex-wrap items-end justify-between gap-3 shadow-sm">
+        <div class="flex flex-wrap items-end gap-3">
+          <div>
+            <label for="dashVehicle" class="block text-[11px] font-medium text-slate-500 mb-1">Veículo</label>
+            <select id="dashVehicle" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+          </div>
+          <div>
+            <label for="dashPeriod" class="block text-[11px] font-medium text-slate-500 mb-1">Atalho de período</label>
+            <select id="dashPeriod" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="all">Todo o histórico</option>
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="6m">Últimos 6 meses</option>
+              <option value="12m">Últimos 12 meses</option>
+              <option value="custom">Personalizado (calendário)</option>
+            </select>
+          </div>
+          <div>
+            <label for="dashDateStart" class="block text-[11px] font-medium text-slate-500 mb-1">Data inicial</label>
+            <input id="dashDateStart" type="date" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label for="dashDateEnd" class="block text-[11px] font-medium text-slate-500 mb-1">Data final</label>
+            <input id="dashDateEnd" type="date" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+        </div>
+        <div class="text-xs text-slate-500 pb-1">
+          <span id="dashRangeInfo">Carregando...</span>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p class="text-xs font-medium text-slate-500">Consumo (Último Ciclo)</p>
+          <p id="kpiLastKmL" class="text-2xl font-bold text-slate-900 mt-1">-- km/L</p>
+          <p id="kpiLastCycleDetail" class="text-xs text-emerald-600 font-medium mt-1">Aguardando ciclo cheio</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">Somente ciclos fechados com tanque cheio</p>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p class="text-xs font-medium text-slate-500">Custo por km (histórico)</p>
+          <p id="kpiCostPerKm" class="text-2xl font-bold text-slate-900 mt-1">R$ --</p>
+          <p id="kpiTotalKm" class="text-xs text-slate-500 mt-1">Distância: -- km</p>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <p class="text-xs font-medium text-slate-500">Total Gasto</p>
+          <p id="kpiTotalSpent" class="text-2xl font-bold text-slate-900 mt-1">R$ --</p>
+          <p id="kpiTotalLiters" class="text-xs text-slate-500 mt-1">-- L em -- abastec.</p>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
+          <div>
+            <p class="text-xs font-medium text-slate-500">Último Abastecimento</p>
+            <p id="kpiLastFill" class="text-2xl font-bold text-slate-900 mt-1">--</p>
+            <p id="kpiLastFillSub" class="text-xs text-slate-500 mt-1">--</p>
+          </div>
+          <button type="button" id="btnGoCalcFromDash" class="text-left text-xs font-semibold text-indigo-600 hover:text-indigo-800 mt-2">
+            Simular paridade por trajeto &rarr;
+          </button>
+        </div>
+      </div>
+
+      <!-- Fuel Comparison Banner (Historical averages) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+        <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">Etanol (histórico)</span>
+            <p class="text-sm text-slate-700 mt-1.5">Média: <strong id="compEtanolKmL">-- km/L</strong> • Preço médio: <strong id="compEtanolPrice">R$ --/L</strong></p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-slate-500">Custo/km</p>
+            <p id="compEtanolCostKm" class="text-lg font-bold text-emerald-700">R$ --</p>
+          </div>
+        </div>
+        <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">Gasolina (histórico)</span>
+            <p class="text-sm text-slate-700 mt-1.5">Média: <strong id="compGasKmL">-- km/L</strong> • Preço médio: <strong id="compGasPrice">R$ --/L</strong></p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-slate-500">Custo/km</p>
+            <p id="compGasCostKm" class="text-lg font-bold text-amber-700">R$ --</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div>
+              <h2 class="text-sm font-semibold text-slate-900">Evolução do Consumo (km/L)</h2>
+              <span class="text-[11px] text-slate-500">Somente ciclos com tanque cheio</span>
+            </div>
+            <div class="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50 text-[11px] font-medium">
+              <button type="button" id="btnConsMonthly" class="px-2 py-1 rounded-md bg-white text-indigo-700 shadow-xs">Mensal</button>
+              <button type="button" id="btnConsDetailed" class="px-2 py-1 rounded-md text-slate-600">Por ciclo</button>
+            </div>
+          </div>
+          <div class="relative h-64">
+            <canvas id="chartConsumption"></canvas>
+          </div>
+          <div class="flex items-center justify-center gap-5 pt-3 text-xs text-slate-600">
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-emerald-500 inline-block"></span>Etanol (km/L)</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-amber-500 inline-block"></span>Gasolina (km/L)</span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-semibold text-slate-900">Gasto Mensal com Combustível (R$)</h2>
+            <span class="text-[11px] text-slate-500">Separado por tipo de combustível</span>
+          </div>
+          <div class="relative h-64">
+            <canvas id="chartMonthlySpent"></canvas>
+          </div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 pt-3 max-w-sm mx-auto text-xs text-slate-600">
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-emerald-500 shrink-0"></span>Etanol (R$)</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-teal-600 shrink-0"></span>Etanol Aditivado (R$)</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-amber-500 shrink-0"></span>Gasolina (R$)</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-orange-600 shrink-0"></span>Gasolina Aditivada (R$)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold text-slate-900">Preço Pago por Litro ao Longo do Tempo (R$/L)</h2>
+          <span class="text-[11px] text-slate-500">Por tipo de combustível</span>
+        </div>
+        <div class="relative h-64">
+          <canvas id="chartUnitPrice"></canvas>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1.5 pt-3 max-w-2xl mx-auto text-xs text-slate-600">
+          <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-emerald-500 shrink-0"></span>Etanol (R$/L)</span>
+          <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-teal-600 shrink-0"></span>Etanol Aditivado (R$/L)</span>
+          <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-amber-500 shrink-0"></span>Gasolina (R$/L)</span>
+          <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-orange-600 shrink-0"></span>Gasolina Aditivada (R$/L)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: CALCULADORA / PARIDADE -->
+    <section id="tab-calculadora" class="hidden space-y-5">
+      <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Calculadora de Paridade e Custo Real por Trajeto</h2>
+            <p class="text-xs text-slate-500">Compare Etanol vs. Gasolina pelo consumo real em cada cenário ou pela referência padrão de 70%.</p>
+          </div>
+          <div>
+            <label for="calcVehicle" class="sr-only">Veículo</label>
+            <select id="calcVehicle" class="text-sm rounded-lg border border-slate-300 bg-white px-3 py-1.5 font-medium text-slate-800"></select>
+          </div>
+        </div>
+
+        <!-- Scenario selector -->
+        <div>
+          <p class="text-xs font-semibold text-slate-600 mb-2">1. Escolha o cenário / trajeto desejado:</p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5" id="calcScenarioGrid">
+            <button type="button" data-scenario="cidadeSemAr" class="calc-scen-btn text-left p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/70 transition">
+              <p class="text-xs font-bold text-slate-900">Cidade • Sem Ar</p>
+              <p class="text-[11px] text-slate-600 mt-1" id="scenLabel-cidadeSemAr">Etanol: -- | Gas: --</p>
+            </button>
+            <button type="button" data-scenario="cidadeComAr" class="calc-scen-btn text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition">
+              <p class="text-xs font-bold text-slate-900">Cidade • Com Ar</p>
+              <p class="text-[11px] text-slate-600 mt-1" id="scenLabel-cidadeComAr">Etanol: -- | Gas: --</p>
+            </button>
+            <button type="button" data-scenario="estradaSemAr" class="calc-scen-btn text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition">
+              <p class="text-xs font-bold text-slate-900">Estrada • Sem Ar</p>
+              <p class="text-[11px] text-slate-600 mt-1" id="scenLabel-estradaSemAr">Etanol: -- | Gas: --</p>
+            </button>
+            <button type="button" data-scenario="estradaComAr" class="calc-scen-btn text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition">
+              <p class="text-xs font-bold text-slate-900">Estrada • Com Ar</p>
+              <p class="text-[11px] text-slate-600 mt-1" id="scenLabel-estradaComAr">Etanol: -- | Gas: --</p>
+            </button>
+            <button type="button" data-scenario="padrao70" class="calc-scen-btn text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition">
+              <p class="text-xs font-bold text-slate-900">Padrão Mercado (70%)</p>
+              <p class="text-[11px] text-slate-600 mt-1">Referência genérica</p>
+            </button>
+          </div>
+        </div>
+
+        <!-- Fuel prices & distance inputs -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+          <div>
+            <label for="calcPriceEtanol" class="block text-xs font-medium text-slate-600 mb-1">Preço do Etanol na bomba (R$/L)</label>
+            <input id="calcPriceEtanol" type="number" step="0.01" min="0.01" placeholder="Ex: 3.84" class="w-full text-sm rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label for="calcPriceGas" class="block text-xs font-medium text-slate-600 mb-1">Preço da Gasolina na bomba (R$/L)</label>
+            <input id="calcPriceGas" type="number" step="0.01" min="0.01" placeholder="Ex: 5.79" class="w-full text-sm rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+          <div>
+            <label for="calcDistance" class="block text-xs font-medium text-slate-600 mb-1">Distância do trajeto (km)</label>
+            <input id="calcDistance" type="number" step="1" min="1" value="100" class="w-full text-sm rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+        </div>
+
+        <!-- Result Card -->
+        <div id="calcResultBox" class="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p class="text-xs font-medium text-slate-500">Recomendação para <span id="calcActiveScenName" class="font-semibold text-slate-800">Cidade • Sem Ar</span></p>
+              <p id="calcWinnerTitle" class="text-lg sm:text-xl font-bold text-slate-900 mt-0.5">Preencha os preços e o consumo do cenário</p>
+            </div>
+            <span id="calcWinnerBadge" class="hidden px-3 py-1 rounded-full text-xs font-bold"></span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-200/80 text-xs">
+            <div>
+              <p class="text-slate-500">Custo Etanol</p>
+              <p id="calcResEtanolCostKm" class="text-sm font-bold text-emerald-700 mt-0.5">R$ -- / km</p>
+              <p id="calcResEtanolTrip" class="text-[11px] text-slate-500">Trajeto: R$ --</p>
+            </div>
+            <div>
+              <p class="text-slate-500">Custo Gasolina</p>
+              <p id="calcResGasCostKm" class="text-sm font-bold text-amber-700 mt-0.5">R$ -- / km</p>
+              <p id="calcResGasTrip" class="text-[11px] text-slate-500">Trajeto: R$ --</p>
+            </div>
+            <div>
+              <p class="text-slate-500">Paridade do Cenário</p>
+              <p id="calcResRealParity" class="text-sm font-bold text-slate-900 mt-0.5">--%</p>
+              <p id="calcResPumpParity" class="text-[11px] text-slate-500">Na bomba: --%</p>
+            </div>
+            <div>
+              <p class="text-slate-500">Etanol empata até</p>
+              <p id="calcResMaxEtanol" class="text-sm font-bold text-indigo-700 mt-0.5">R$ -- / L</p>
+              <p id="calcResSavings" class="text-[11px] text-slate-500">Economia: --</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Editable consumption profile matrix -->
+      <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">Perfil de Consumo Cadastrado do Veículo (km/L)</h3>
+            <p class="text-xs text-slate-500">Cadastre o consumo real do carro em cada situação para substituir a regra genérica dos 70%.</p>
+          </div>
+          <button type="button" id="btnSaveProfileCalc" class="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
+            Salvar perfil no veículo
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                <th class="py-2 px-3 font-semibold">Cenário / Trajeto</th>
+                <th class="py-2 px-3 font-semibold">Etanol (km/L)</th>
+                <th class="py-2 px-3 font-semibold">Gasolina (km/L)</th>
+                <th class="py-2 px-3 font-semibold">Paridade Limite</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td class="py-2 px-3 font-medium">Cidade — Sem Ar</td>
+                <td class="py-2 px-3"><input id="prof_cidadeSemAr_et" type="number" step="0.1" min="0.1" placeholder="Ex: 7.2" class="prof-input w-24 rounded-lg border border-slate-300 px-2 py-1 text-sm" /></td>
+                <td class="py-2 px-3"><input id="prof_cidadeSemAr_gas" type="number" step="0.1" min="0.1" placeholder="Ex: 10.2" class="prof-input w-24 rounded-lg border border-slate-300 px-2 py-1 text-sm" /></td>
+                <td class="py-2 px-3 text-slate-600 font-medium" id="prof_par_cidadeSemAr">--%</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 font-medium">Cidade — Com Ar</td>
+                <td class="py-2 px-3"><input id="prof_cidadeComAr_et" type="number" step="0.1" min="0.1" placeholder="Ex: 6.4" class="prof-input w-24 rounded-lg border border-slate-300 px-2 py-1 text-sm" /></td>
+                <td class="py-2 px-3"><input id="prof_cidadeComAr_gas" type="number" step="0.1" min="0.1" placeholder="Ex: 9.0" class="prof-input w-24 rounded-lg border border-slate-300 px-2 py-1 text-sm" /></td>
+                <td class="py-2 px-3 text-slate-600 font-medium" id="prof_par_cidadeComAr">--%</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 font-medium">Estrada — Sem Ar</td>
+                <td class="py-2 px-3"><input id="prof_estradaSemAr_et" type="number" step="0.1" min="0.1" placeholder="Ex: 9.8" class="prof-input w-24 rounded-lg border border-slate-300 px-2 py-1 text-sm" /></td>
+                <td class="py-2 px-3"><input id="prof_estradaSemAr_gas" type="number" step="0.1" min="0.1" placeholder="Ex: 14.0" class="prof-input w-24 rounded-lg border border-slate-300 px-2 py-1 text-sm" /></td>
+                <td class="py-2 px-3 text-slate-600 font-medium" id="prof_par_estradaSemAr">--%</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 font-medium">Estrada — Com Ar</td>
+                <td class="py-2 px-3"><input id="prof_estradaComAr_et" type="number" step="0.1" min="0.1" placeholder="Ex: 8.8" class="prof-input w-24 rounded-lg border border-slate-300 px-2 py-1 text-sm" /></td>
+                <td class="py-2 px-3"><input id="prof_estradaComAr_gas" type="number" step="0.1" min="0.1" placeholder="Ex: 12.6" class="prof-input w-24 rounded-lg border border-slate-300 px-2 py-1 text-sm" /></td>
+                <td class="py-2 px-3 text-slate-600 font-medium" id="prof_par_estradaComAr">--%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: ABASTECIMENTOS -->
+    <section id="tab-abastecimentos" class="hidden space-y-3">
+      <!-- Compact Toolbar + Collapsible Filter Menu -->
+      <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2 flex-1 min-w-[200px]">
+            <input id="filterSearch" type="text" placeholder="Buscar posto, combustível, anotações..." class="w-full text-sm rounded-lg border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <button id="btnToggleFilters" type="button" class="whitespace-nowrap text-xs sm:text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+              <span>Filtros</span>
+              <span id="activeFilterCount" class="hidden px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-indigo-600 text-white">0</span>
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btnExportCsv" type="button" class="text-xs sm:text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
+              Exportar CSV
+            </button>
+            <button id="btnNewFuel" type="button" class="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
+              + Novo
+            </button>
+          </div>
+        </div>
+
+        <!-- Collapsible Criteria Panel -->
+        <div id="filterDrawer" class="hidden pt-3 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-5 gap-3 items-end">
+          <div>
+            <label for="filterDateStart" class="block text-[11px] font-medium text-slate-500 mb-1">Data inicial</label>
+            <input id="filterDateStart" type="date" class="w-full text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5" />
+          </div>
+          <div>
+            <label for="filterDateEnd" class="block text-[11px] font-medium text-slate-500 mb-1">Data final</label>
+            <input id="filterDateEnd" type="date" class="w-full text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5" />
+          </div>
+          <div>
+            <label for="filterFuel" class="block text-[11px] font-medium text-slate-500 mb-1">Combustível</label>
+            <select id="filterFuel" class="w-full text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5">
+              <option value="all">Todos</option>
+              <option value="Etanol">Etanol</option>
+              <option value="Etanol Aditivado">Etanol Aditivado</option>
+              <option value="Gasolina">Gasolina</option>
+              <option value="Gasolina Aditivada">Gasolina Aditivada</option>
+            </select>
+          </div>
+          <div>
+            <label for="filterFullTank" class="block text-[11px] font-medium text-slate-500 mb-1">Tanque Cheio</label>
+            <select id="filterFullTank" class="w-full text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5">
+              <option value="all">Todos</option>
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
+            </select>
+          </div>
+          <div>
+            <button id="btnClearFuelFilters" type="button" class="w-full text-xs sm:text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition">
+              Limpar critérios
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Cards -->
+      <div id="fuelCardsMobile" class="md:hidden space-y-2.5"></div>
+
+      <!-- Desktop Table -->
+      <div class="hidden md:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                <th class="py-2.5 px-3">Data</th>
+                <th class="py-2.5 px-3">Combustível</th>
+                <th class="py-2.5 px-3 text-right">Odômetro</th>
+                <th class="py-2.5 px-3 text-right">Litros</th>
+                <th class="py-2.5 px-3 text-right">R$/L</th>
+                <th class="py-2.5 px-3 text-right">Total</th>
+                <th class="py-2.5 px-3 text-right">Consumo</th>
+                <th class="py-2.5 px-3">Cheio</th>
+                <th class="py-2.5 px-3">Anotações</th>
+              </tr>
+            </thead>
+            <tbody id="fuelTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="fuelEmptyState" class="hidden bg-white rounded-xl border border-slate-200 py-10 text-center text-sm text-slate-500">
+        Nenhum abastecimento encontrado para os filtros selecionados.
+      </div>
+    </section>
+
+    <!-- TAB: VEÍCULOS -->
+    <section id="tab-veiculos" class="hidden space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-base font-semibold text-slate-900">Veículos Cadastrados</h2>
+        </div>
+        <button id="btnNewVehicle" type="button" class="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
+          + Novo Veículo
+        </button>
+      </div>
+      <div id="vehicleList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+  </main>
+
+  <!-- Modal Abastecimento -->
+  <div id="modalFuel" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 id="modalFuelTitle" class="text-base font-bold text-slate-900">Novo Abastecimento</h3>
+        <button type="button" id="closeModalFuel" class="text-slate-400 hover:text-slate-700 text-xl leading-none">&times;</button>
+      </div>
+      <form id="formFuel" class="space-y-3" novalidate>
+        <input type="hidden" id="fuelId" />
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="fuelPlaca" class="block text-xs font-medium text-slate-600 mb-1">Placa</label>
+            <select id="fuelPlaca" required class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5 bg-white"></select>
+          </div>
+          <div>
+            <label for="fuelData" class="block text-xs font-medium text-slate-600 mb-1">Data</label>
+            <input id="fuelData" type="date" required class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="fuelComb" class="block text-xs font-medium text-slate-600 mb-1">Combustível</label>
+            <select id="fuelComb" required class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5 bg-white">
+              <option value="Etanol">Etanol</option>
+              <option value="Etanol Aditivado">Etanol Aditivado</option>
+              <option value="Gasolina">Gasolina</option>
+              <option value="Gasolina Aditivada">Gasolina Aditivada</option>
+            </select>
+          </div>
+          <div>
+            <label for="fuelKm" class="block text-xs font-medium text-slate-600 mb-1">Quilometragem (km)</label>
+            <input id="fuelKm" type="number" step="1" min="1" required class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5" />
+            <p id="fuelKmHint" class="text-[11px] text-slate-400 mt-0.5"></p>
+            <p id="fuelKmError" class="hidden text-[11px] font-semibold text-rose-600 mt-0.5"></p>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label for="fuelTotal" class="block text-xs font-medium text-slate-600 mb-1">Valor Total (R$)</label>
+            <input id="fuelTotal" type="number" step="0.01" min="0.01" required class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5" />
+          </div>
+          <div>
+            <label for="fuelLitros" class="block text-xs font-medium text-slate-600 mb-1">Litros</label>
+            <input id="fuelLitros" type="number" step="0.001" min="0.001" required class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5" />
+          </div>
+          <div>
+            <label for="fuelUnit" class="block text-xs font-medium text-slate-600 mb-1">Valor/L (R$)</label>
+            <input id="fuelUnit" type="number" step="0.01" min="0.01" required class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5" />
+          </div>
+        </div>
+        <p id="fuelValueError" class="hidden text-xs font-semibold text-rose-600"></p>
+        <p class="text-[11px] text-slate-400">Preencha dois valores (ex: Total + Litros, ou Litros + Valor/L) que o terceiro é calculado automaticamente.</p>
+        <div class="flex items-center gap-2 pt-1">
+          <input id="fuelFull" type="checkbox" class="w-4 h-4 text-indigo-600 rounded border-slate-300" />
+          <label for="fuelFull" class="text-sm text-slate-700 font-medium">Tanque cheio (usado para cálculo de km/L)</label>
+        </div>
+        <div>
+          <label for="fuelNotes" class="block text-xs font-medium text-slate-600 mb-1">Anotações (Posto, descontos, pagamentos)</label>
+          <textarea id="fuelNotes" rows="3" placeholder="Ex: Posto Carrefour&#10;Desconto App = R$ 2,50&#10;Cartão de Crédito = R$ ..." class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5"></textarea>
+        </div>
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+          <button type="button" id="btnDeleteFuel" class="hidden text-xs font-semibold px-3 py-2 rounded-lg text-rose-600 hover:bg-rose-50 transition">
+            Excluir registro
+          </button>
+          <div class="flex items-center gap-2 ml-auto">
+            <button type="button" id="btnCancelFuel" class="text-xs sm:text-sm font-medium px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">Cancelar</button>
+            <button type="submit" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">Salvar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Veículo -->
+  <div id="modalVehicle" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-xl border border-slate-200 p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900">Novo Veículo</h3>
+        <button type="button" id="closeModalVehicle" class="text-slate-400 hover:text-slate-700 text-xl leading-none">&times;</button>
+      </div>
+      <form id="formVehicle" class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="veicPlaca" class="block text-xs font-medium text-slate-600 mb-1">Placa</label>
+            <input id="veicPlaca" type="text" required placeholder="ABC-1D23" class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5 uppercase" />
+          </div>
+          <div>
+            <label for="veicAno" class="block text-xs font-medium text-slate-600 mb-1">Ano</label>
+            <input id="veicAno" type="number" min="1950" required placeholder="2024" class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5" />
+          </div>
+        </div>
+        <div>
+          <label for="veicModelo" class="block text-xs font-medium text-slate-600 mb-1">Modelo</label>
+          <input id="veicModelo" type="text" required placeholder="Ex: Onix Premier" class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5" />
+        </div>
+        <div>
+          <label for="veicObs" class="block text-xs font-medium text-slate-600 mb-1">Observações</label>
+          <textarea id="veicObs" rows="2" class="w-full text-sm rounded-lg border border-slate-300 px-2.5 py-1.5"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" id="btnCancelVehicle" class="text-xs sm:text-sm font-medium px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">Cancelar</button>
+          <button type="submit" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Configuração da API -->
+  <div id="modalApiConfig" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-xl border border-slate-200 p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900">Conectar à Planilha (Apps Script)</h3>
+        <button type="button" id="closeModalApiConfig" class="text-slate-400 hover:text-slate-700 text-xl leading-none">&times;</button>
+      </div>
+      <form id="formApiConfig" class="space-y-3">
+        <div>
+          <label for="cfgApiUrl" class="block text-xs font-medium text-slate-600 mb-1">URL do App da Web (/exec)</label>
+          <input id="cfgApiUrl" type="url" required placeholder="https://script.google.com/macros/s/.../exec" class="w-full text-sm rounded-lg border border-slate-300 px-3 py-2" />
+        </div>
+        <div>
+          <label for="cfgApiToken" class="block text-xs font-medium text-slate-600 mb-1">Token de Segurança (API_TOKEN)</label>
+          <input id="cfgApiToken" type="password" required placeholder="Mesma senha definida no Code.gs" class="w-full text-sm rounded-lg border border-slate-300 px-3 py-2" />
+        </div>
+        <p class="text-[11px] text-slate-500">Esses dados ficam salvos apenas neste aparelho para autenticar na sua planilha.</p>
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" id="btnCancelApiConfig" class="text-xs sm:text-sm font-medium px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">Cancelar</button>
+          <button type="submit" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">Salvar e Conectar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl px-5 py-4 shadow-xl border border-slate-200 flex items-center gap-3">
+      <div class="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      <span id="loadingText" class="text-sm font-medium text-slate-800">Sincronizando com a planilha...</span>
+    </div>
+  </div>
+
+  <!-- Toast -->
+    <!-- Mobile Bottom Navigation -->
+  <nav class="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 grid grid-cols-4 h-16 shadow-lg" aria-label="Navegação móvel">
+    <button type="button" class="mob-tab-btn flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-indigo-600" data-tab="dashboard" aria-selected="true">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      <span>Dashboard</span>
+    </button>
+    <button type="button" class="mob-tab-btn flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-slate-500" data-tab="calculadora" aria-selected="false">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+      <span>Paridade</span>
+    </button>
+    <button type="button" class="mob-tab-btn flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-slate-500" data-tab="abastecimentos" aria-selected="false">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      <span>Abastec.</span>
+    </button>
+    <button type="button" class="mob-tab-btn flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-slate-500" data-tab="veiculos" aria-selected="false">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 17h.01M16 17h.01M5 11l1.5-4.5A2 2 0 018.4 5h7.2a2 2 0 011.9 1.5L19 11m-14 0h14m-14 0v6a1 1 0 001 1h1m12-7v6a1 1 0 01-1 1h-1"/></svg>
+      <span>Veículos</span>
+    </button>
+  </nav>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed bottom-20 sm:bottom-5 right-4 sm:right-5 z-50 bg-slate-900 text-white text-xs sm:text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg"></div>
+
+  <script>
+    const INITIAL_DATA = { veiculos: [], abastecimentos: [] };
+    const STORAGE_KEY = 'agendacarro_proto_v3';
+    const THEME_KEY = 'agendacarro_theme';
+    let themeMode = 'system';
+    try { themeMode = localStorage.getItem(THEME_KEY) || 'system'; } catch (e) {}
+
+    function isDarkActive() {
+      if (themeMode === 'dark') return true;
+      if (themeMode === 'light') return false;
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    function applyTheme(reRender = false) {
+      const dark = isDarkActive();
+      document.documentElement.classList.toggle('dark', dark);
+      const labelMap = { system: 'Tema: Auto', dark: 'Tema: Escuro', light: 'Tema: Claro' };
+      const btn = document.getElementById('btnThemeToggle');
+      if (btn) btn.textContent = labelMap[themeMode] || 'Tema: Auto';
+      if (reRender && typeof renderDashboard === 'function') {
+        renderDashboard();
+      }
+    }
+    const SCENARIOS = [
+      { key: 'cidadeSemAr', label: 'Cidade • Sem Ar' },
+      { key: 'cidadeComAr', label: 'Cidade • Com Ar' },
+      { key: 'estradaSemAr', label: 'Estrada • Sem Ar' },
+      { key: 'estradaComAr', label: 'Estrada • Com Ar' }
+    ];
+
+    let state = loadState();
+    let charts = { consumption: null, monthly: null, price: null };
+    let activeScenario = 'cidadeSemAr';
+    let consumptionMode = 'monthly';
+    let editedOrder = [];
+
+    function ensureProfiles(data) {
+      data.veiculos.forEach(v => {
+        if (!v.perfis) {
+          v.perfis = {
+            cidadeSemAr: { etanol: '', gasolina: '' },
+            cidadeComAr: { etanol: '', gasolina: '' },
+            estradaSemAr: { etanol: '', gasolina: '' },
+            estradaComAr: { etanol: '', gasolina: '' }
+          };
+        }
+      });
+      return data;
+    }
+
+    const API_CFG_KEY = 'agendacarro_api_config_v1';
+
+    function getApiConfig() {
+      try {
+        const raw = localStorage.getItem(API_CFG_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.url && parsed.token) return parsed;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function isAppsScript() {
+      return getApiConfig() !== null;
+    }
+
+    function openApiConfigModal() {
+      const cfg = getApiConfig();
+      document.getElementById('cfgApiUrl').value = cfg?.url || '';
+      document.getElementById('cfgApiToken').value = cfg?.token || '';
+      document.getElementById('modalApiConfig').classList.remove('hidden');
+    }
+
+    function setLoading(active, text = 'Sincronizando com a planilha...') {
+      const ov = document.getElementById('loadingOverlay');
+      document.getElementById('loadingText').textContent = text;
+      ov.classList.toggle('hidden', !active);
+    }
+
+    async function runGas(fnName, args = [], loadingMsg = 'Sincronizando com a planilha...') {
+      const cfg = getApiConfig();
+      if (!cfg) {
+        openApiConfigModal();
+        throw new Error('Configure a URL e o Token da planilha.');
+      }
+      setLoading(true, loadingMsg);
+      try {
+        let res;
+        if (fnName === 'getInitialData') {
+          const sep = cfg.url.includes('?') ? '&' : '?';
+          const resp = await fetch(`${cfg.url}${sep}token=${encodeURIComponent(cfg.token)}`);
+          res = await resp.json();
+        } else {
+          let payload = {};
+          if (fnName === 'saveAbastecimento') payload = args[0];
+          else if (fnName === 'deleteAbastecimento') payload = { id: args[0] };
+          else if (fnName === 'saveVeiculo') payload = args[0];
+          else if (fnName === 'savePerfisConsumo') payload = { placa: args[0], perfis: args[1] };
+
+          const resp = await fetch(cfg.url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ token: cfg.token, action: fnName, payload })
+          });
+          res = await resp.json();
+        }
+        if (!res || !res.ok) {
+          throw new Error((res && res.error) || 'Falha na resposta da planilha.');
+        }
+        return fnName === 'getInitialData' ? res.data : res;
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function applyServerData(serverData) {
+      state = ensureProfiles(serverData || { veiculos: [], abastecimentos: [] });
+      saveState();
+      populateVehicleSelects();
+      updateBadges();
+      syncPeriodDatesFromShortcut();
+      renderDashboard();
+      renderFuelTable();
+      renderVehicles();
+      loadProfileInputsIntoCalc();
+    }
+
+    async function loadFromSheet() {
+      if (!isAppsScript()) {
+        openApiConfigModal();
+        return;
+      }
+      try {
+        const data = await runGas('getInitialData', [], 'Carregando dados da planilha...');
+        applyServerData(data);
+        showToast('Planilha sincronizada!');
+      } catch (err) {
+        showToast('Erro ao conectar: ' + (err.message || err));
+      }
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && Array.isArray(parsed.abastecimentos) && Array.isArray(parsed.veiculos)) {
+            return ensureProfiles(parsed);
+          }
+        }
+      } catch (e) {}
+      return ensureProfiles(JSON.parse(JSON.stringify(INITIAL_DATA)));
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => el.classList.add('hidden'), 2600);
+    }
+
+    function fmtBRL(v) {
+      return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+    function fmtNum(v, dec = 2) {
+      return Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    }
+    function fmtDateBR(iso) {
+      if (!iso) return '--';
+      const [y, m, d] = iso.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    function fuelFamily(comb) {
+      return (comb || '').toLowerCase().includes('gasolina') ? 'Gasolina' : 'Etanol';
+    }
+
+    function fuelBadgeClass(comb) {
+      switch (comb) {
+        case 'Etanol Aditivado':
+          return 'bg-teal-100 text-teal-900 border border-teal-300';
+        case 'Gasolina Aditivada':
+          return 'bg-orange-100 text-orange-900 border border-orange-300';
+        case 'Gasolina':
+          return 'bg-amber-100 text-amber-800 border border-amber-200';
+        case 'Etanol':
+        default:
+          return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+      }
+    }
+
+    function computeConsumptionMap(records) {
+      const sorted = [...records].sort((a, b) => a.km - b.km || a.data.localeCompare(b.data));
+      const map = new Map();
+      let lastFullKm = null;
+      let accLiters = 0;
+      let accCost = 0;
+
+      for (const r of sorted) {
+        if (lastFullKm === null) {
+          if (r.tanqueCheio) {
+            lastFullKm = r.km;
+            accLiters = 0;
+            accCost = 0;
+          }
+          continue;
+        }
+        accLiters += Number(r.litros || 0);
+        accCost += Number(r.valorTotal || 0);
+        if (r.tanqueCheio) {
+          const kmDiff = r.km - lastFullKm;
+          if (kmDiff > 0 && accLiters > 0) {
+            map.set(r.id, {
+              kmL: kmDiff / accLiters,
+              kmDiff,
+              costKm: accCost / kmDiff,
+              litersCycle: accLiters,
+              family: fuelFamily(r.combustivel),
+              combustivel: r.combustivel
+            });
+          }
+          lastFullKm = r.km;
+          accLiters = 0;
+          accCost = 0;
+        }
+      }
+      return map;
+    }
+
+    function populateVehicleSelects() {
+      const selects = ['dashVehicle', 'calcVehicle', 'fuelPlaca'];
+      for (const id of selects) {
+        const sel = document.getElementById(id);
+        const prev = sel.value;
+        sel.innerHTML = '';
+        if (id === 'dashVehicle') {
+          const opt = document.createElement('option');
+          opt.value = 'all';
+          opt.textContent = 'Todos os veículos';
+          sel.appendChild(opt);
+        }
+        for (const v of state.veiculos) {
+          const opt = document.createElement('option');
+          opt.value = v.placa;
+          opt.textContent = `${v.modelo} ${v.ano} (${v.placa})`;
+          sel.appendChild(opt);
+        }
+        if (prev && [...sel.options].some(o => o.value === prev)) {
+          sel.value = prev;
+        }
+      }
+
+    }
+
+    function updateBadges() {
+      document.getElementById('badgeAbast').textContent = state.abastecimentos.length;
+      document.getElementById('badgeVeic').textContent = state.veiculos.length;
+    }
+
+    function syncPeriodDatesFromShortcut() {
+      const placa = document.getElementById('dashVehicle').value;
+      const period = document.getElementById('dashPeriod').value;
+      const list = state.abastecimentos
+        .filter(r => placa === 'all' || r.placa === placa)
+        .sort((a, b) => a.data.localeCompare(b.data));
+
+      if (list.length === 0 || period === 'custom') return;
+
+      const minAll = list[0].data;
+      const maxAll = list[list.length - 1].data;
+      let start = minAll;
+      let end = maxAll;
+
+      if (period === '2026' || period === '2025' || period === '2024') {
+        start = `${period}-01-01`;
+        end = `${period}-12-31`;
+      } else if (period === '6m' || period === '12m') {
+        const maxD = new Date(maxAll + 'T00:00:00');
+        const cutoff = new Date(maxD);
+        cutoff.setMonth(cutoff.getMonth() - (period === '6m' ? 6 : 12));
+        start = cutoff.toISOString().slice(0, 10);
+        end = maxAll;
+      }
+      document.getElementById('dashDateStart').value = start;
+      document.getElementById('dashDateEnd').value = end;
+    }
+
+    function getFilteredDashRecords() {
+      const placa = document.getElementById('dashVehicle').value;
+      const start = document.getElementById('dashDateStart').value;
+      const end = document.getElementById('dashDateEnd').value;
+      return state.abastecimentos
+        .filter(r => {
+          if (placa !== 'all' && r.placa !== placa) return false;
+          if (start && r.data < start) return false;
+          if (end && r.data > end) return false;
+          return true;
+        })
+        .sort((a, b) => a.data.localeCompare(b.data) || a.km - b.km);
+    }
+
+    function renderDashboard() {
+      const records = getFilteredDashRecords();
+      const placa = document.getElementById('dashVehicle').value;
+      const allMap = computeConsumptionMap(
+        state.abastecimentos.filter(r => placa === 'all' || r.placa === placa)
+      );
+
+      if (records.length === 0) {
+        document.getElementById('dashRangeInfo').textContent = 'Sem registros no período';
+        document.getElementById('kpiLastKmL').textContent = '-- km/L';
+        document.getElementById('kpiLastCycleDetail').textContent = 'Sem ciclo cheio no período';
+        document.getElementById('kpiCostPerKm').textContent = 'R$ --';
+        document.getElementById('kpiTotalKm').textContent = 'Distância: 0 km';
+        document.getElementById('kpiTotalSpent').textContent = 'R$ 0,00';
+        document.getElementById('kpiTotalLiters').textContent = '0,000 L';
+        document.getElementById('kpiLastFill').textContent = '--';
+        document.getElementById('kpiLastFillSub').textContent = '--';
+        renderCharts([], []);
+        return;
+      }
+
+      document.getElementById('dashRangeInfo').textContent =
+        `${fmtDateBR(records[0].data)} a ${fmtDateBR(records[records.length - 1].data)} (${records.length} registros)`;
+
+      let totalSpent = 0;
+      let totalLiters = 0;
+      const validSegments = [];
+      let etLiters = 0, etSpent = 0, gasLiters = 0, gasSpent = 0;
+
+      for (const r of records) {
+        totalSpent += Number(r.valorTotal || 0);
+        totalLiters += Number(r.litros || 0);
+        if (fuelFamily(r.combustivel) === 'Etanol') {
+          etLiters += r.litros;
+          etSpent += r.valorTotal;
+        } else {
+          gasLiters += r.litros;
+          gasSpent += r.valorTotal;
+        }
+        const seg = allMap.get(r.id);
+        if (seg) validSegments.push({ ...seg, data: r.data });
+      }
+
+      const kmStart = records[0].km;
+      const kmEnd = records[records.length - 1].km;
+      const totalKm = Math.max(0, kmEnd - kmStart);
+
+      // Show ONLY the last full-tank cycle in the consumption KPI card
+      if (validSegments.length > 0) {
+        const lastSeg = validSegments[validSegments.length - 1];
+        document.getElementById('kpiLastKmL').textContent = `${fmtNum(lastSeg.kmL, 2)} km/L`;
+        document.getElementById('kpiLastCycleDetail').textContent =
+          `${lastSeg.combustivel} • ${lastSeg.kmDiff} km / ${fmtNum(lastSeg.litersCycle, 3)} L`;
+      } else {
+        document.getElementById('kpiLastKmL').textContent = '-- km/L';
+        document.getElementById('kpiLastCycleDetail').textContent = 'Sem ciclo cheio fechado no período';
+      }
+
+      const costPerKm = totalKm > 0 ? totalSpent / totalKm : 0;
+      document.getElementById('kpiCostPerKm').textContent = totalKm > 0 ? fmtBRL(costPerKm) : 'R$ --';
+      document.getElementById('kpiTotalKm').textContent = `Distância: ${totalKm.toLocaleString('pt-BR')} km`;
+      document.getElementById('kpiTotalSpent').textContent = fmtBRL(totalSpent);
+      document.getElementById('kpiTotalLiters').textContent = `${fmtNum(totalLiters, 3)} L em ${records.length} abastec.`;
+
+      const lastRec = records[records.length - 1];
+      document.getElementById('kpiLastFill').textContent = fmtBRL(lastRec.valorTotal);
+      document.getElementById('kpiLastFillSub').textContent = `${fmtDateBR(lastRec.data)} • ${lastRec.combustivel} (${fmtNum(lastRec.valorUnitario, 2)}/L)`;
+
+      const etSegs = validSegments.filter(s => s.family === 'Etanol');
+      const gasSegs = validSegments.filter(s => s.family === 'Gasolina');
+      const etAvgKmL = etSegs.length ? etSegs.reduce((a, b) => a + b.kmDiff, 0) / etSegs.reduce((a, b) => a + b.litersCycle, 0) : 0;
+      const gasAvgKmL = gasSegs.length ? gasSegs.reduce((a, b) => a + b.kmDiff, 0) / gasSegs.reduce((a, b) => a + b.litersCycle, 0) : 0;
+      const etAvgPrice = etLiters > 0 ? etSpent / etLiters : 0;
+      const gasAvgPrice = gasLiters > 0 ? gasSpent / gasLiters : 0;
+
+      document.getElementById('compEtanolKmL').textContent = etAvgKmL ? `${fmtNum(etAvgKmL, 2)} km/L` : '--';
+      document.getElementById('compEtanolPrice').textContent = etAvgPrice ? `${fmtBRL(etAvgPrice)}/L` : '--';
+      document.getElementById('compEtanolCostKm').textContent = (etAvgKmL && etAvgPrice) ? fmtBRL(etAvgPrice / etAvgKmL) : 'R$ --';
+
+      document.getElementById('compGasKmL').textContent = gasAvgKmL ? `${fmtNum(gasAvgKmL, 2)} km/L` : '--';
+      document.getElementById('compGasPrice').textContent = gasAvgPrice ? `${fmtBRL(gasAvgPrice)}/L` : '--';
+      document.getElementById('compGasCostKm').textContent = (gasAvgKmL && gasAvgPrice) ? fmtBRL(gasAvgPrice / gasAvgKmL) : 'R$ --';
+
+      renderCharts(records, validSegments);
+    }
+
+    function renderCharts(records, validSegments) {
+      let cLabels = [];
+      let etData = [];
+      let gasData = [];
+
+      if (consumptionMode === 'monthly') {
+        const cmMap = new Map();
+        for (const seg of validSegments) {
+          const ym = seg.data.slice(0, 7);
+          if (!cmMap.has(ym)) {
+            cmMap.set(ym, { Etanol: { km: 0, lit: 0 }, Gasolina: { km: 0, lit: 0 } });
+          }
+          cmMap.get(ym)[seg.family].km += seg.kmDiff;
+          cmMap.get(ym)[seg.family].lit += seg.litersCycle;
+        }
+        const cKeys = [...cmMap.keys()].sort();
+        cLabels = cKeys.map(k => `${k.slice(5)}/${k.slice(2, 4)}`);
+        etData = cKeys.map(k => {
+          const d = cmMap.get(k).Etanol;
+          return d.lit > 0 ? Number((d.km / d.lit).toFixed(2)) : null;
+        });
+        gasData = cKeys.map(k => {
+          const d = cmMap.get(k).Gasolina;
+          return d.lit > 0 ? Number((d.km / d.lit).toFixed(2)) : null;
+        });
+      } else {
+        cLabels = validSegments.map(s => fmtDateBR(s.data).slice(0, 5) + '/' + s.data.slice(2, 4));
+        etData = validSegments.map(s => s.family === 'Etanol' ? Number(s.kmL.toFixed(2)) : null);
+        gasData = validSegments.map(s => s.family === 'Gasolina' ? Number(s.kmL.toFixed(2)) : null);
+      }
+
+      if (charts.consumption) charts.consumption.destroy();
+      charts.consumption = new Chart(document.getElementById('chartConsumption'), {
+        type: 'line',
+        data: {
+          labels: cLabels,
+          datasets: [
+            { label: 'Etanol (km/L)', data: etData, borderColor: '#10b981', backgroundColor: '#10b981', spanGaps: false, tension: 0.25, pointRadius: consumptionMode === 'monthly' ? 3.5 : 2.5, borderWidth: 2 },
+            { label: 'Gasolina (km/L)', data: gasData, borderColor: '#f59e0b', backgroundColor: '#f59e0b', spanGaps: false, tension: 0.25, pointRadius: consumptionMode === 'monthly' ? 3.5 : 2.5, borderWidth: 2 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: isDarkActive() ? '#94a3b8' : '#475569' }, grid: { color: isDarkActive() ? 'rgba(148,163,184,0.12)' : 'rgba(15,23,42,0.06)' } },
+            y: { beginAtZero: false, title: { display: true, text: 'km/L', color: isDarkActive() ? '#94a3b8' : '#475569' }, ticks: { color: isDarkActive() ? '#94a3b8' : '#475569' }, grid: { color: isDarkActive() ? 'rgba(148,163,184,0.12)' : 'rgba(15,23,42,0.06)' } }
+          }
+        }
+      });
+
+      const monthMap = new Map();
+      for (const r of records) {
+        const ym = r.data.slice(0, 7);
+        if (!monthMap.has(ym)) {
+          monthMap.set(ym, { 'Etanol': 0, 'Etanol Aditivado': 0, 'Gasolina': 0, 'Gasolina Aditivada': 0 });
+        }
+        const key = monthMap.get(ym)[r.combustivel] !== undefined ? r.combustivel : fuelFamily(r.combustivel);
+        monthMap.get(ym)[key] += r.valorTotal;
+      }
+      const mKeys = [...monthMap.keys()].sort();
+      const mLabels = mKeys.map(k => `${k.slice(5)}/${k.slice(2, 4)}`);
+
+      if (charts.monthly) charts.monthly.destroy();
+      charts.monthly = new Chart(document.getElementById('chartMonthlySpent'), {
+        type: 'bar',
+        data: {
+          labels: mLabels,
+          datasets: [
+            { label: 'Etanol (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Etanol'].toFixed(2))), backgroundColor: '#10b981', borderRadius: 4 },
+            { label: 'Etanol Aditivado (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Etanol Aditivado'].toFixed(2))), backgroundColor: '#0d9488', borderRadius: 4 },
+            { label: 'Gasolina (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Gasolina'].toFixed(2))), backgroundColor: '#f59e0b', borderRadius: 4 },
+            { label: 'Gasolina Aditivada (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Gasolina Aditivada'].toFixed(2))), backgroundColor: '#ea580c', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.dataset.label}: ${fmtBRL(ctx.parsed.y)}`,
+                footer: (items) => {
+                  const sum = items.reduce((acc, it) => acc + (it.parsed.y || 0), 0);
+                  return `Total do mês: ${fmtBRL(sum)}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: { stacked: true, ticks: { color: isDarkActive() ? '#94a3b8' : '#475569' }, grid: { color: isDarkActive() ? 'rgba(148,163,184,0.12)' : 'rgba(15,23,42,0.06)' } },
+            y: { stacked: true, beginAtZero: true, ticks: { color: isDarkActive() ? '#94a3b8' : '#475569' }, grid: { color: isDarkActive() ? 'rgba(148,163,184,0.12)' : 'rgba(15,23,42,0.06)' } }
+          }
+        }
+      });
+
+      const pLabels = records.map(r => fmtDateBR(r.data).slice(0, 5) + '/' + r.data.slice(2, 4));
+      if (charts.price) charts.price.destroy();
+      charts.price = new Chart(document.getElementById('chartUnitPrice'), {
+        type: 'line',
+        data: {
+          labels: pLabels,
+          datasets: [
+            { label: 'Etanol (R$/L)', data: records.map(r => r.combustivel === 'Etanol' ? Number(r.valorUnitario.toFixed(2)) : null), borderColor: '#10b981', backgroundColor: '#10b981', spanGaps: false, tension: 0.2, pointRadius: 2.5, borderWidth: 2 },
+            { label: 'Etanol Aditivado (R$/L)', data: records.map(r => r.combustivel === 'Etanol Aditivado' ? Number(r.valorUnitario.toFixed(2)) : null), borderColor: '#0d9488', backgroundColor: '#0d9488', spanGaps: false, tension: 0.2, pointRadius: 2.5, borderWidth: 2 },
+            { label: 'Gasolina (R$/L)', data: records.map(r => r.combustivel === 'Gasolina' ? Number(r.valorUnitario.toFixed(2)) : null), borderColor: '#f59e0b', backgroundColor: '#f59e0b', spanGaps: false, tension: 0.2, pointRadius: 2.5, borderWidth: 2 },
+            { label: 'Gasolina Aditivada (R$/L)', data: records.map(r => r.combustivel === 'Gasolina Aditivada' ? Number(r.valorUnitario.toFixed(2)) : null), borderColor: '#ea580c', backgroundColor: '#ea580c', spanGaps: false, tension: 0.2, pointRadius: 2.5, borderWidth: 2 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: isDarkActive() ? '#94a3b8' : '#475569' }, grid: { color: isDarkActive() ? 'rgba(148,163,184,0.12)' : 'rgba(15,23,42,0.06)' } },
+            y: { beginAtZero: false, title: { display: true, text: 'R$/L', color: isDarkActive() ? '#94a3b8' : '#475569' }, ticks: { color: isDarkActive() ? '#94a3b8' : '#475569' }, grid: { color: isDarkActive() ? 'rgba(148,163,184,0.12)' : 'rgba(15,23,42,0.06)' } }
+          }
+        }
+      });
+    }
+
+    // Calculadora / Paridade
+    function getSelectedCalcVehicle() {
+      const placa = document.getElementById('calcVehicle').value;
+      return state.veiculos.find(v => v.placa === placa) || state.veiculos[0];
+    }
+
+    function loadProfileInputsIntoCalc() {
+      const v = getSelectedCalcVehicle();
+      if (!v) return;
+      ensureProfiles(state);
+      for (const sc of SCENARIOS) {
+        const p = v.perfis[sc.key] || { etanol: '', gasolina: '' };
+        document.getElementById(`prof_${sc.key}_et`).value = p.etanol;
+        document.getElementById(`prof_${sc.key}_gas`).value = p.gasolina;
+      }
+      if (!document.getElementById('calcPriceEtanol').value) {
+        const lastEt = [...state.abastecimentos].reverse().find(r => r.placa === v.placa && fuelFamily(r.combustivel) === 'Etanol');
+        if (lastEt) document.getElementById('calcPriceEtanol').value = lastEt.valorUnitario.toFixed(2);
+      }
+      if (!document.getElementById('calcPriceGas').value) {
+        const lastGas = [...state.abastecimentos].reverse().find(r => r.placa === v.placa && fuelFamily(r.combustivel) === 'Gasolina');
+        if (lastGas) document.getElementById('calcPriceGas').value = lastGas.valorUnitario.toFixed(2);
+      }
+      updateCalcDisplay();
+    }
+
+    function readProfileInputsFromCalc() {
+      const out = {};
+      for (const sc of SCENARIOS) {
+        const et = parseFloat(document.getElementById(`prof_${sc.key}_et`).value);
+        const gas = parseFloat(document.getElementById(`prof_${sc.key}_gas`).value);
+        out[sc.key] = { etanol: et > 0 ? et : '', gasolina: gas > 0 ? gas : '' };
+      }
+      return out;
+    }
+
+    function updateCalcDisplay() {
+      const prof = readProfileInputsFromCalc();
+      for (const sc of SCENARIOS) {
+        const p = prof[sc.key];
+        const etTxt = p.etanol ? `${fmtNum(p.etanol, 1)} km/L` : '--';
+        const gasTxt = p.gasolina ? `${fmtNum(p.gasolina, 1)} km/L` : '--';
+        document.getElementById(`scenLabel-${sc.key}`).textContent = `Etanol: ${etTxt} | Gas: ${gasTxt}`;
+        document.getElementById(`prof_par_${sc.key}`).textContent =
+          (p.etanol && p.gasolina) ? `${fmtNum((p.etanol / p.gasolina) * 100, 1)}%` : '--%';
+      }
+
+      document.querySelectorAll('.calc-scen-btn').forEach(btn => {
+        const isSel = btn.dataset.scenario === activeScenario;
+        const baseSpan = '';
+        btn.className = isSel
+          ? `calc-scen-btn ${baseSpan}text-left p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/70 transition`
+          : `calc-scen-btn ${baseSpan}text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition`;
+      });
+
+      const priceEt = parseFloat(document.getElementById('calcPriceEtanol').value);
+      const priceGas = parseFloat(document.getElementById('calcPriceGas').value);
+      const dist = parseFloat(document.getElementById('calcDistance').value) || 100;
+      const badge = document.getElementById('calcWinnerBadge');
+
+      if (activeScenario === 'padrao70') {
+        document.getElementById('calcActiveScenName').textContent = 'Padrão de Mercado (70%)';
+        if (!(priceEt > 0) || !(priceGas > 0)) {
+          document.getElementById('calcWinnerTitle').textContent = 'Informe os preços de Etanol e Gasolina na bomba';
+          badge.classList.add('hidden');
+          return;
+        }
+        const pumpParity = (priceEt / priceGas) * 100;
+        const maxEtanol = priceGas * 0.70;
+        document.getElementById('calcResEtanolCostKm').textContent = 'Base 70%';
+        document.getElementById('calcResEtanolTrip').textContent = 'Ref. genérica';
+        document.getElementById('calcResGasCostKm').textContent = 'Base 100%';
+        document.getElementById('calcResGasTrip').textContent = 'Ref. genérica';
+        document.getElementById('calcResRealParity').textContent = '70,0%';
+        document.getElementById('calcResPumpParity').textContent = `Na bomba: ${fmtNum(pumpParity, 1)}%`;
+        document.getElementById('calcResMaxEtanol').textContent = `${fmtBRL(maxEtanol)} / L`;
+
+        badge.classList.remove('hidden');
+        if (pumpParity <= 70) {
+          document.getElementById('calcWinnerTitle').textContent = `Etanol compensa pela regra de 70% (${fmtNum(pumpParity, 1)}%)`;
+          badge.textContent = 'ETANOL VENCE';
+          badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200';
+          document.getElementById('calcResSavings').textContent = `Diferença p/ teto: ${fmtBRL(maxEtanol - priceEt)}/L`;
+        } else {
+          document.getElementById('calcWinnerTitle').textContent = `Gasolina compensa pela regra de 70% (${fmtNum(pumpParity, 1)}%)`;
+          badge.textContent = 'GASOLINA VENCE';
+          badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200';
+          document.getElementById('calcResSavings').textContent = `Etanol acima do teto em ${fmtBRL(priceEt - maxEtanol)}/L`;
+        }
+        return;
+      }
+
+      const scObj = SCENARIOS.find(s => s.key === activeScenario);
+      document.getElementById('calcActiveScenName').textContent = scObj ? scObj.label : '';
+
+      const pSel = prof[activeScenario];
+      if (!pSel || !pSel.etanol || !pSel.gasolina || !(priceEt > 0) || !(priceGas > 0)) {
+        document.getElementById('calcWinnerTitle').textContent = 'Informe o consumo do cenário (abaixo) e os preços na bomba';
+        badge.classList.add('hidden');
+        document.getElementById('calcResEtanolCostKm').textContent = 'R$ -- / km';
+        document.getElementById('calcResEtanolTrip').textContent = 'Trajeto: R$ --';
+        document.getElementById('calcResGasCostKm').textContent = 'R$ -- / km';
+        document.getElementById('calcResGasTrip').textContent = 'Trajeto: R$ --';
+        document.getElementById('calcResRealParity').textContent = (pSel?.etanol && pSel?.gasolina) ? `${fmtNum((pSel.etanol / pSel.gasolina) * 100, 1)}%` : '--%';
+        document.getElementById('calcResPumpParity').textContent = (priceEt > 0 && priceGas > 0) ? `Na bomba: ${fmtNum((priceEt / priceGas) * 100, 1)}%` : 'Na bomba: --%';
+        document.getElementById('calcResMaxEtanol').textContent = 'R$ -- / L';
+        document.getElementById('calcResSavings').textContent = 'Economia: --';
+        return;
+      }
+
+      const costKmEt = priceEt / pSel.etanol;
+      const costKmGas = priceGas / pSel.gasolina;
+      const tripEt = costKmEt * dist;
+      const tripGas = costKmGas * dist;
+      const realParity = (pSel.etanol / pSel.gasolina) * 100;
+      const pumpParity = (priceEt / priceGas) * 100;
+      const maxEtanol = priceGas * (pSel.etanol / pSel.gasolina);
+      const diffTrip = Math.abs(tripGas - tripEt);
+
+      document.getElementById('calcResEtanolCostKm').textContent = `${fmtBRL(costKmEt)} / km`;
+      document.getElementById('calcResEtanolTrip').textContent = `${dist} km: ${fmtBRL(tripEt)}`;
+      document.getElementById('calcResGasCostKm').textContent = `${fmtBRL(costKmGas)} / km`;
+      document.getElementById('calcResGasTrip').textContent = `${dist} km: ${fmtBRL(tripGas)}`;
+      document.getElementById('calcResRealParity').textContent = `${fmtNum(realParity, 1)}%`;
+      document.getElementById('calcResPumpParity').textContent = `Na bomba: ${fmtNum(pumpParity, 1)}%`;
+      document.getElementById('calcResMaxEtanol').textContent = `${fmtBRL(maxEtanol)} / L`;
+
+      badge.classList.remove('hidden');
+      if (costKmEt < costKmGas) {
+        const pct = ((costKmGas - costKmEt) / costKmGas) * 100;
+        document.getElementById('calcWinnerTitle').textContent = `Etanol compensa mais (${fmtNum(pct, 1)}% mais barato/km)`;
+        badge.textContent = 'ETANOL VENCE';
+        badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200';
+      } else if (costKmGas < costKmEt) {
+        const pct = ((costKmEt - costKmGas) / costKmEt) * 100;
+        document.getElementById('calcWinnerTitle').textContent = `Gasolina compensa mais (${fmtNum(pct, 1)}% mais barata/km)`;
+        badge.textContent = 'GASOLINA VENCE';
+        badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200';
+      } else {
+        document.getElementById('calcWinnerTitle').textContent = 'Empate exato no custo por km';
+        badge.textContent = 'EMPATE';
+        badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-800';
+      }
+      document.getElementById('calcResSavings').textContent = `Economia em ${dist} km: ${fmtBRL(diffTrip)}`;
+    }
+
+    function updateFilterBadge() {
+      let count = 0;
+      if (document.getElementById('filterDateStart').value) count++;
+      if (document.getElementById('filterDateEnd').value) count++;
+      if (document.getElementById('filterFuel').value !== 'all') count++;
+      if (document.getElementById('filterFullTank').value !== 'all') count++;
+      const badge = document.getElementById('activeFilterCount');
+      badge.textContent = count;
+      badge.classList.toggle('hidden', count === 0);
+    }
+
+    function renderFuelTable() {
+      updateFilterBadge();
+      const q = document.getElementById('filterSearch').value.trim().toLowerCase();
+      const fuel = document.getElementById('filterFuel').value;
+      const full = document.getElementById('filterFullTank').value;
+      const dStart = document.getElementById('filterDateStart').value;
+      const dEnd = document.getElementById('filterDateEnd').value;
+
+      const consMap = computeConsumptionMap(state.abastecimentos);
+      const list = [...state.abastecimentos]
+        .sort((a, b) => b.data.localeCompare(a.data) || b.km - a.km)
+        .filter(r => {
+          if (fuel !== 'all' && r.combustivel !== fuel) return false;
+          if (full === 'Sim' && !r.tanqueCheio) return false;
+          if (full === 'Não' && r.tanqueCheio) return false;
+          if (dStart && r.data < dStart) return false;
+          if (dEnd && r.data > dEnd) return false;
+          if (q && !(r.anotacoes.toLowerCase().includes(q) || r.combustivel.toLowerCase().includes(q) || r.placa.toLowerCase().includes(q) || fmtDateBR(r.data).includes(q))) {
+            return false;
+          }
+          return true;
+        });
+
+      const tbody = document.getElementById('fuelTableBody');
+      const cardsEl = document.getElementById('fuelCardsMobile');
+      const empty = document.getElementById('fuelEmptyState');
+      tbody.innerHTML = '';
+      cardsEl.innerHTML = '';
+
+      if (list.length === 0) {
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      for (const r of list) {
+        const seg = consMap.get(r.id);
+        const pillClass = fuelBadgeClass(r.combustivel);
+        const snippet = r.anotacoes ? r.anotacoes.replace(/\n+/g, ' • ').slice(0, 65) + (r.anotacoes.length > 65 ? '...' : '') : '—';
+
+        // Desktop table row
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-indigo-50/50 cursor-pointer transition';
+        tr.addEventListener('click', () => openFuelModal(r));
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 whitespace-nowrap font-medium text-slate-900">${fmtDateBR(r.data)}</td>
+          <td class="py-2.5 px-3 whitespace-nowrap"><span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${pillClass}">${r.combustivel}</span></td>
+          <td class="py-2.5 px-3 text-right whitespace-nowrap">${r.km.toLocaleString('pt-BR')} km</td>
+          <td class="py-2.5 px-3 text-right whitespace-nowrap">${fmtNum(r.litros, 3)} L</td>
+          <td class="py-2.5 px-3 text-right whitespace-nowrap">${fmtNum(r.valorUnitario, 2)}</td>
+          <td class="py-2.5 px-3 text-right whitespace-nowrap font-semibold text-slate-900">${fmtBRL(r.valorTotal)}</td>
+          <td class="py-2.5 px-3 text-right whitespace-nowrap font-medium ${seg ? 'text-indigo-700' : 'text-slate-400'}">${seg ? fmtNum(seg.kmL, 2) + ' km/L' : '—'}</td>
+          <td class="py-2.5 px-3 whitespace-nowrap">${r.tanqueCheio ? 'Sim' : '<span class="text-slate-400">Não</span>'}</td>
+          <td class="py-2.5 px-3 text-slate-600 max-w-xs truncate">${escapeHtml(snippet)}</td>
+        `;
+        tbody.appendChild(tr);
+
+        // Mobile card
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm active:bg-indigo-50/50 cursor-pointer space-y-2';
+        card.addEventListener('click', () => openFuelModal(r));
+        card.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${pillClass}">${r.combustivel}</span>
+              <span class="text-xs font-medium text-slate-600">${fmtDateBR(r.data)}</span>
+            </div>
+            <span class="text-sm font-bold text-slate-900">${fmtBRL(r.valorTotal)}</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-xs pt-1 border-t border-slate-100">
+            <div>
+              <p class="text-[10px] text-slate-400">Odômetro</p>
+              <p class="font-semibold text-slate-800">${r.km.toLocaleString('pt-BR')} km</p>
+            </div>
+            <div>
+              <p class="text-[10px] text-slate-400">Litros / R$ L</p>
+              <p class="font-semibold text-slate-800">${fmtNum(r.litros, 3)} L • ${fmtNum(r.valorUnitario, 2)}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-[10px] text-slate-400">${r.tanqueCheio ? 'Tanque cheio' : 'Parcial'}</p>
+              <p class="font-bold ${seg ? 'text-indigo-700' : 'text-slate-400'}">${seg ? fmtNum(seg.kmL, 2) + ' km/L' : '—'}</p>
+            </div>
+          </div>
+          ${r.anotacoes ? `<p class="text-[11px] text-slate-500 truncate pt-1 border-t border-slate-100">${escapeHtml(snippet)}</p>` : ''}
+        `;
+        cardsEl.appendChild(card);
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderVehicles() {
+      const container = document.getElementById('vehicleList');
+      container.innerHTML = '';
+      for (const v of state.veiculos) {
+        const abast = state.abastecimentos.filter(a => a.placa === v.placa).sort((a, b) => a.km - b.km);
+        const totalSpent = abast.reduce((s, a) => s + a.valorTotal, 0);
+        const lastKm = abast.length ? abast[abast.length - 1].km : 0;
+        const p = v.perfis || {};
+        const hasProfile = SCENARIOS.some(s => p[s.key]?.etanol || p[s.key]?.gasolina);
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3';
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">${escapeHtml(v.modelo)} (${escapeHtml(String(v.ano))})</h3>
+              <p class="text-xs font-semibold text-indigo-600">${escapeHtml(v.placa)}</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-medium">${abast.length} abastecimentos</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs">
+            <div>
+              <p class="text-slate-500">Último odômetro</p>
+              <p class="text-sm font-bold text-slate-900">${lastKm ? lastKm.toLocaleString('pt-BR') + ' km' : '--'}</p>
+            </div>
+            <div>
+              <p class="text-slate-500">Total em combustível</p>
+              <p class="text-sm font-bold text-slate-900">${fmtBRL(totalSpent)}</p>
+            </div>
+          </div>
+          <div class="text-xs pt-2 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-slate-500">${hasProfile ? 'Perfil de consumo cadastrado' : 'Perfil de consumo pendente'}</span>
+            <button type="button" class="text-indigo-600 font-semibold hover:underline" data-edit-profile="${escapeHtml(v.placa)}">Configurar consumo &rarr;</button>
+          </div>
+          ${v.obs ? `<p class="text-xs text-slate-500">${escapeHtml(v.obs)}</p>` : ''}
+        `;
+        card.querySelector('[data-edit-profile]').addEventListener('click', () => {
+          document.getElementById('calcVehicle').value = v.placa;
+          loadProfileInputsIntoCalc();
+          switchTab('calculadora');
+        });
+        container.appendChild(card);
+      }
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const active = btn.dataset.tab === tabName;
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      document.querySelectorAll('.mob-tab-btn').forEach(btn => {
+        const active = btn.dataset.tab === tabName;
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+        btn.classList.toggle('text-indigo-600', active);
+        btn.classList.toggle('text-slate-500', !active);
+      });
+      ['dashboard', 'calculadora', 'abastecimentos', 'veiculos'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
+      });
+      if (tabName === 'dashboard') renderDashboard();
+      if (tabName === 'calculadora') loadProfileInputsIntoCalc();
+      if (tabName === 'abastecimentos') renderFuelTable();
+      if (tabName === 'veiculos') renderVehicles();
+    }
+
+    function getLastKmForPlate(placa, excludeId = null) {
+      return state.abastecimentos
+        .filter(r => r.placa === placa && r.id !== excludeId)
+        .reduce((max, r) => Math.max(max, r.km), 0);
+    }
+
+    // Modal Fuel
+    function openFuelModal(record = null) {
+      const modal = document.getElementById('modalFuel');
+      const delBtn = document.getElementById('btnDeleteFuel');
+      const kmErr = document.getElementById('fuelKmError');
+      const valErr = document.getElementById('fuelValueError');
+      kmErr.classList.add('hidden');
+      valErr.classList.add('hidden');
+
+      document.getElementById('modalFuelTitle').textContent = record ? 'Editar Abastecimento' : 'Novo Abastecimento';
+
+      if (record) {
+        document.getElementById('fuelId').value = record.id;
+        document.getElementById('fuelPlaca').value = record.placa;
+        document.getElementById('fuelData').value = record.data;
+        document.getElementById('fuelComb').value = record.combustivel;
+        document.getElementById('fuelKm').value = record.km;
+        document.getElementById('fuelUnit').value = Number(record.valorUnitario).toFixed(2);
+        document.getElementById('fuelLitros').value = Number(record.litros).toFixed(3);
+        document.getElementById('fuelTotal').value = Number(record.valorTotal).toFixed(2);
+        document.getElementById('fuelFull').checked = !!record.tanqueCheio;
+        document.getElementById('fuelNotes').value = record.anotacoes || '';
+        document.getElementById('fuelKmHint').textContent = '';
+        delBtn.classList.remove('hidden');
+        editedOrder = ['total', 'litros'];
+      } else {
+        const placa = state.veiculos[0]?.placa || '';
+        const lastKm = getLastKmForPlate(placa);
+        document.getElementById('fuelId').value = '';
+        document.getElementById('fuelPlaca').value = placa;
+        document.getElementById('fuelData').value = new Date().toISOString().slice(0, 10);
+        document.getElementById('fuelComb').value = 'Etanol';
+        document.getElementById('fuelKm').value = '';
+        document.getElementById('fuelKmHint').textContent = lastKm ? `Último km registrado: ${lastKm.toLocaleString('pt-BR')} km` : '';
+        document.getElementById('fuelUnit').value = '';
+        document.getElementById('fuelLitros').value = '';
+        document.getElementById('fuelTotal').value = '';
+        document.getElementById('fuelFull').checked = false;
+        document.getElementById('fuelNotes').value = '';
+        delBtn.classList.add('hidden');
+        editedOrder = [];
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeFuelModal() {
+      document.getElementById('modalFuel').classList.add('hidden');
+    }
+
+    // Bidirectional auto-calculation with clean handling when fields are cleared
+    function handleFuelMathInput(changedField) {
+      const els = {
+        total: document.getElementById('fuelTotal'),
+        litros: document.getElementById('fuelLitros'),
+        unit: document.getElementById('fuelUnit')
+      };
+      const val = parseFloat(els[changedField].value);
+
+      if (!(val > 0)) {
+        // User cleared or zeroed this field: remove it from editedOrder
+        editedOrder = editedOrder.filter(f => f !== changedField);
+        return;
+      }
+
+      // Add/move this field to the front of editedOrder, keeping only fields that currently have > 0
+      editedOrder = [changedField, ...editedOrder.filter(f => f !== changedField && parseFloat(els[f].value) > 0)];
+
+      if (editedOrder.length < 2) return;
+
+      const pair = new Set(editedOrder.slice(0, 2));
+      const total = parseFloat(els.total.value);
+      const litros = parseFloat(els.litros.value);
+      const unit = parseFloat(els.unit.value);
+
+      if (pair.has('total') && pair.has('litros') && total > 0 && litros > 0) {
+        els.unit.value = (total / litros).toFixed(2);
+      } else if (pair.has('litros') && pair.has('unit') && litros > 0 && unit > 0) {
+        els.total.value = (litros * unit).toFixed(2);
+      } else if (pair.has('total') && pair.has('unit') && total > 0 && unit > 0) {
+        els.litros.value = (total / unit).toFixed(3);
+      }
+    }
+
+    document.getElementById('fuelTotal').addEventListener('input', () => handleFuelMathInput('total'));
+    document.getElementById('fuelLitros').addEventListener('input', () => handleFuelMathInput('litros'));
+    document.getElementById('fuelUnit').addEventListener('input', () => handleFuelMathInput('unit'));
+
+    document.getElementById('fuelPlaca').addEventListener('change', () => {
+      if (!document.getElementById('fuelId').value) {
+        const lastKm = getLastKmForPlate(document.getElementById('fuelPlaca').value);
+        document.getElementById('fuelKmHint').textContent = lastKm ? `Último km registrado: ${lastKm.toLocaleString('pt-BR')} km` : '';
+      }
+    });
+
+    document.getElementById('formFuel').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const existingId = document.getElementById('fuelId').value;
+      const placa = document.getElementById('fuelPlaca').value;
+      const kmVal = parseInt(document.getElementById('fuelKm').value, 10);
+      const totalVal = parseFloat(document.getElementById('fuelTotal').value);
+      const litrosVal = parseFloat(document.getElementById('fuelLitros').value);
+      const unitVal = parseFloat(document.getElementById('fuelUnit').value);
+
+      const kmErr = document.getElementById('fuelKmError');
+      const valErr = document.getElementById('fuelValueError');
+      kmErr.classList.add('hidden');
+      valErr.classList.add('hidden');
+
+      if (!(kmVal > 0)) {
+        kmErr.textContent = 'A quilometragem deve ser maior que zero.';
+        kmErr.classList.remove('hidden');
+        document.getElementById('fuelKm').focus();
+        return;
+      }
+
+      if (!existingId) {
+        const lastKm = getLastKmForPlate(placa);
+        if (lastKm > 0 && kmVal < lastKm) {
+          kmErr.textContent = `A quilometragem não pode ser menor que a última registrada (${lastKm.toLocaleString('pt-BR')} km).`;
+          kmErr.classList.remove('hidden');
+          document.getElementById('fuelKm').focus();
+          return;
+        }
+      }
+
+      if (!(totalVal > 0) || !(litrosVal > 0) || !(unitVal > 0)) {
+        valErr.textContent = 'Valor Total, Litros e Valor/L devem ser maiores que zero.';
+        valErr.classList.remove('hidden');
+        return;
+      }
+
+      const id = existingId || ('loc_' + Date.now().toString(36));
+      const item = {
+        id,
+        placa,
+        data: document.getElementById('fuelData').value,
+        combustivel: document.getElementById('fuelComb').value,
+        km: kmVal,
+        valorUnitario: Number(unitVal.toFixed(2)),
+        litros: Number(litrosVal.toFixed(3)),
+        valorTotal: Number(totalVal.toFixed(2)),
+        tanqueCheio: document.getElementById('fuelFull').checked,
+        anotacoes: document.getElementById('fuelNotes').value.trim()
+      };
+      if (isAppsScript()) {
+        item.id = existingId || '';
+        runGas('saveAbastecimento', [item], 'Salvando abastecimento na planilha...')
+          .then(res => {
+            applyServerData(res.data);
+            closeFuelModal();
+            showToast(existingId ? 'Abastecimento atualizado na planilha!' : 'Abastecimento salvo na planilha!');
+          })
+          .catch(err => showToast('Erro ao salvar: ' + (err.message || err)));
+        return;
+      }
+      const idx = state.abastecimentos.findIndex(r => r.id === id);
+      if (idx >= 0) {
+        state.abastecimentos[idx] = item;
+        showToast('Abastecimento atualizado!');
+      } else {
+        state.abastecimentos.push(item);
+        showToast('Abastecimento adicionado!');
+      }
+      saveState();
+      updateBadges();
+      closeFuelModal();
+      syncPeriodDatesFromShortcut();
+      renderDashboard();
+      renderFuelTable();
+      renderVehicles();
+    });
+
+    document.getElementById('btnDeleteFuel').addEventListener('click', () => {
+      const id = document.getElementById('fuelId').value;
+      if (!id) return;
+      if (isAppsScript()) {
+        runGas('deleteAbastecimento', [id], 'Excluindo registro da planilha...')
+          .then(res => {
+            applyServerData(res.data);
+            closeFuelModal();
+            showToast('Registro excluído da planilha.');
+          })
+          .catch(err => showToast('Erro ao excluir: ' + (err.message || err)));
+        return;
+      }
+      state.abastecimentos = state.abastecimentos.filter(r => r.id !== id);
+      saveState();
+      updateBadges();
+      closeFuelModal();
+      renderDashboard();
+      renderFuelTable();
+      renderVehicles();
+      showToast('Registro excluído.');
+    });
+
+    // Modal Vehicle
+    document.getElementById('btnNewVehicle').addEventListener('click', () => document.getElementById('modalVehicle').classList.remove('hidden'));
+    document.getElementById('closeModalVehicle').addEventListener('click', () => document.getElementById('modalVehicle').classList.add('hidden'));
+    document.getElementById('btnCancelVehicle').addEventListener('click', () => document.getElementById('modalVehicle').classList.add('hidden'));
+    document.getElementById('formVehicle').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const veicObj = {
+        placa: document.getElementById('veicPlaca').value.trim().toUpperCase(),
+        modelo: document.getElementById('veicModelo').value.trim(),
+        ano: parseInt(document.getElementById('veicAno').value, 10),
+        obs: document.getElementById('veicObs').value.trim()
+      };
+      if (isAppsScript()) {
+        runGas('saveVeiculo', [veicObj], 'Salvando veículo na planilha...')
+          .then(res => {
+            applyServerData(res.data);
+            document.getElementById('modalVehicle').classList.add('hidden');
+            e.target.reset();
+            showToast('Veículo salvo na planilha!');
+          })
+          .catch(err => showToast('Erro ao salvar veículo: ' + (err.message || err)));
+        return;
+      }
+      state.veiculos.push({
+        ...veicObj,
+        perfis: {
+          cidadeSemAr: { etanol: '', gasolina: '' },
+          cidadeComAr: { etanol: '', gasolina: '' },
+          estradaSemAr: { etanol: '', gasolina: '' },
+          estradaComAr: { etanol: '', gasolina: '' }
+        }
+      });
+      saveState();
+      populateVehicleSelects();
+      updateBadges();
+      document.getElementById('modalVehicle').classList.add('hidden');
+      e.target.reset();
+      renderVehicles();
+      showToast('Veículo adicionado!');
+    });
+
+    // Export CSV
+    document.getElementById('btnExportCsv').addEventListener('click', () => {
+      const headers = ['ID', 'PLACA', 'DATA', 'VALOR TOTAL', 'VALOR UNITARIO', 'LITROS', 'QUILOMETRAGEM', 'TANQUE CHEIO', 'COMBUSTIVEL', 'ANOTACOES'];
+      const rows = state.abastecimentos.map(r => [
+        r.id, r.placa, fmtDateBR(r.data),
+        r.valorTotal.toFixed(2), r.valorUnitario.toFixed(2), r.litros.toFixed(3),
+        r.km, r.tanqueCheio ? 'Sim' : 'Não', r.combustivel,
+        `"${(r.anotacoes || '').replace(/"/g, '""')}"`
+      ].join(','));
+      const blob = new Blob([[headers.join(','), ...rows].join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'abastecimentos_agendacarro.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('CSV exportado!');
+    });
+
+    document.getElementById('btnApiConfig').addEventListener('click', openApiConfigModal);
+    document.getElementById('closeModalApiConfig').addEventListener('click', () => document.getElementById('modalApiConfig').classList.add('hidden'));
+    document.getElementById('btnCancelApiConfig').addEventListener('click', () => document.getElementById('modalApiConfig').classList.add('hidden'));
+    document.getElementById('formApiConfig').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const url = document.getElementById('cfgApiUrl').value.trim();
+      const token = document.getElementById('cfgApiToken').value.trim();
+      if (!url || !token) return;
+      try { localStorage.setItem(API_CFG_KEY, JSON.stringify({ url, token })); } catch (err) {}
+      document.getElementById('modalApiConfig').classList.add('hidden');
+      loadFromSheet();
+    });
+
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+
+    // Refresh data from Google Sheets
+    document.getElementById('btnRefreshData').addEventListener('click', loadFromSheet);
+
+    // Wire events
+    document.querySelectorAll('.tab-btn, .mob-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+    document.getElementById('btnQuickAdd').addEventListener('click', () => openFuelModal(null));
+    document.getElementById('btnNewFuel').addEventListener('click', () => openFuelModal(null));
+    document.getElementById('closeModalFuel').addEventListener('click', closeFuelModal);
+    document.getElementById('btnCancelFuel').addEventListener('click', closeFuelModal);
+    document.getElementById('btnGoCalcFromDash').addEventListener('click', () => switchTab('calculadora'));
+    document.getElementById('btnConsMonthly').addEventListener('click', () => {
+      consumptionMode = 'monthly';
+      document.getElementById('btnConsMonthly').className = 'px-2 py-1 rounded-md bg-white text-indigo-700 shadow-xs';
+      document.getElementById('btnConsDetailed').className = 'px-2 py-1 rounded-md text-slate-600';
+      renderDashboard();
+    });
+    document.getElementById('btnConsDetailed').addEventListener('click', () => {
+      consumptionMode = 'detailed';
+      document.getElementById('btnConsDetailed').className = 'px-2 py-1 rounded-md bg-white text-indigo-700 shadow-xs';
+      document.getElementById('btnConsMonthly').className = 'px-2 py-1 rounded-md text-slate-600';
+      renderDashboard();
+    });
+
+    document.getElementById('btnToggleFilters').addEventListener('click', () => {
+      document.getElementById('filterDrawer').classList.toggle('hidden');
+    });
+
+    document.getElementById('dashVehicle').addEventListener('change', () => {
+      syncPeriodDatesFromShortcut();
+      renderDashboard();
+    });
+    document.getElementById('dashPeriod').addEventListener('change', () => {
+      syncPeriodDatesFromShortcut();
+      renderDashboard();
+    });
+    document.getElementById('dashDateStart').addEventListener('change', () => {
+      document.getElementById('dashPeriod').value = 'custom';
+      renderDashboard();
+    });
+    document.getElementById('dashDateEnd').addEventListener('change', () => {
+      document.getElementById('dashPeriod').value = 'custom';
+      renderDashboard();
+    });
+
+    document.getElementById('filterSearch').addEventListener('input', renderFuelTable);
+    document.getElementById('filterDateStart').addEventListener('change', renderFuelTable);
+    document.getElementById('filterDateEnd').addEventListener('change', renderFuelTable);
+    document.getElementById('filterFuel').addEventListener('change', renderFuelTable);
+    document.getElementById('filterFullTank').addEventListener('change', renderFuelTable);
+    document.getElementById('btnClearFuelFilters').addEventListener('click', () => {
+      document.getElementById('filterSearch').value = '';
+      document.getElementById('filterDateStart').value = '';
+      document.getElementById('filterDateEnd').value = '';
+      document.getElementById('filterFuel').value = 'all';
+      document.getElementById('filterFullTank').value = 'all';
+      renderFuelTable();
+    });
+
+    document.getElementById('calcVehicle').addEventListener('change', loadProfileInputsIntoCalc);
+    document.querySelectorAll('.calc-scen-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeScenario = btn.dataset.scenario;
+        updateCalcDisplay();
+      });
+    });
+    ['calcPriceEtanol', 'calcPriceGas', 'calcDistance'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateCalcDisplay);
+    });
+    document.querySelectorAll('.prof-input').forEach(inp => {
+      inp.addEventListener('input', updateCalcDisplay);
+    });
+    document.getElementById('btnSaveProfileCalc').addEventListener('click', () => {
+      const v = getSelectedCalcVehicle();
+      if (!v) return;
+      const novosPerfis = readProfileInputsFromCalc();
+      if (isAppsScript()) {
+        runGas('savePerfisConsumo', [v.placa, novosPerfis], 'Salvando perfil na planilha...')
+          .then(res => {
+            applyServerData(res.data);
+            showToast(`Perfil de consumo salvo na planilha para ${v.placa}!`);
+          })
+          .catch(err => showToast('Erro ao salvar perfil: ' + (err.message || err)));
+        return;
+      }
+      v.perfis = novosPerfis;
+      saveState();
+      updateCalcDisplay();
+      renderVehicles();
+      showToast(`Perfil de consumo salvo para ${v.placa}!`);
+    });
+
+    document.getElementById('btnThemeToggle').addEventListener('click', () => {
+      const order = ['system', 'dark', 'light'];
+      themeMode = order[(order.indexOf(themeMode) + 1) % order.length];
+      try { localStorage.setItem(THEME_KEY, themeMode); } catch (e) {}
+      applyTheme(true);
+    });
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (themeMode === 'system') applyTheme(true);
+      });
+    }
+
+    // Init
+    applyTheme(false);
+    populateVehicleSelects();
+    updateBadges();
+    syncPeriodDatesFromShortcut();
+    renderDashboard();
+    loadFromSheet();
+  </script>
+</body>
+</html>
