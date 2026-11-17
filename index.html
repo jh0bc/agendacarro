@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agenda Carro — Gestão de Veículo e Abastecimentos</title>
-  <meta name="theme-color" content="#4f46e5" />
+  <meta name="theme-color" content="#0284c7" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="./manifest.json" />
@@ -19,52 +19,53 @@
   <style>
     body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .tab-btn[aria-selected="true"] {
-      color: #4f46e5;
-      border-bottom-color: #4f46e5;
-      background-color: #eef2ff;
+      color: #0284c7;
+      border-bottom-color: #0284c7;
+      background-color: #f0f9ff;
     }
     @media (min-width: 640px) {
       .tab-btn[aria-selected="true"] {
         background-color: transparent;
       }
     }
-    html.dark body { background-color: #0f172a; color: #e2e8f0; }
-    html.dark .bg-white { background-color: #1e293b !important; }
-    html.dark .bg-slate-50 { background-color: #0f172a !important; }
-    html.dark .bg-slate-100 { background-color: #334155 !important; }
-    html.dark .bg-emerald-50\/70 { background-color: rgba(6, 78, 59, 0.35) !important; }
-    html.dark .bg-amber-50\/70 { background-color: rgba(120, 53, 15, 0.35) !important; }
-    html.dark .bg-indigo-50\/70 { background-color: rgba(49, 46, 129, 0.45) !important; }
+    html.dark body { background-color: #000000 !important; color: #f4f4f5 !important; }
+    html.dark .bg-white { background-color: #0d0d0f !important; }
+    html.dark .bg-slate-50 { background-color: #000000 !important; }
+    html.dark .bg-slate-100 { background-color: #18181b !important; }
+    html.dark .bg-emerald-50\/70 { background-color: rgba(6, 78, 59, 0.30) !important; }
+    html.dark .bg-amber-50\/70 { background-color: rgba(120, 53, 15, 0.30) !important; }
+    html.dark .bg-sky-50\/70 { background-color: rgba(2, 132, 199, 0.22) !important; }
     html.dark .border-slate-200,
     html.dark .border-slate-300,
-    html.dark .border-slate-100 { border-color: #334155 !important; }
-    html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #334155 !important; }
+    html.dark .border-slate-100 { border-color: #27272a !important; }
+    html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #27272a !important; }
     html.dark .border-emerald-200 { border-color: #065f46 !important; }
     html.dark .border-amber-200 { border-color: #92400e !important; }
-    html.dark .text-slate-900 { color: #f8fafc !important; }
-    html.dark .text-slate-800 { color: #e2e8f0 !important; }
-    html.dark .text-slate-700 { color: #cbd5e1 !important; }
-    html.dark .text-slate-600 { color: #94a3b8 !important; }
-    html.dark .text-slate-500 { color: #94a3b8 !important; }
-    html.dark .text-slate-400 { color: #64748b !important; }
-    html.dark .text-indigo-600 { color: #818cf8 !important; }
-    html.dark .text-indigo-700 { color: #a5b4fc !important; }
+    html.dark .border-sky-200 { border-color: #0369a1 !important; }
+    html.dark .text-slate-900 { color: #fafafa !important; }
+    html.dark .text-slate-800 { color: #e4e4e7 !important; }
+    html.dark .text-slate-700 { color: #d4d4d8 !important; }
+    html.dark .text-slate-600 { color: #a1a1aa !important; }
+    html.dark .text-slate-500 { color: #a1a1aa !important; }
+    html.dark .text-slate-400 { color: #71717a !important; }
+    html.dark .text-sky-600 { color: #38bdf8 !important; }
+    html.dark .text-sky-700 { color: #7dd3fc !important; }
     html.dark .text-emerald-700 { color: #34d399 !important; }
     html.dark .text-amber-700 { color: #fbbf24 !important; }
     html.dark input,
     html.dark select,
     html.dark textarea {
-      background-color: #0f172a !important;
-      color: #f1f5f9 !important;
-      border-color: #475569 !important;
+      background-color: #121215 !important;
+      color: #fafafa !important;
+      border-color: #3f3f46 !important;
     }
     html.dark .tab-btn[aria-selected="true"] {
-      color: #a5b4fc;
-      border-bottom-color: #818cf8;
+      color: #38bdf8;
+      border-bottom-color: #38bdf8;
     }
     html.dark .hover\:bg-slate-100:hover,
-    html.dark .hover\:bg-slate-50:hover { background-color: #334155 !important; }
-    html.dark .hover\:bg-indigo-50\/50:hover { background-color: rgba(79, 70, 229, 0.18) !important; }
+    html.dark .hover\:bg-slate-50:hover { background-color: #18181b !important; }
+    html.dark .hover\:bg-sky-50\/50:hover { background-color: rgba(2, 132, 199, 0.16) !important; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -91,7 +92,7 @@
           <button id="btnRefreshData" type="button" class="whitespace-nowrap text-[11px] sm:text-xs font-medium px-2 sm:px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition" title="Recarregar dados da planilha">
             Atualizar
           </button>
-          <button id="btnQuickAdd" type="button" class="whitespace-nowrap text-[11px] sm:text-sm font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-sm">
+          <button id="btnQuickAdd" type="button" class="whitespace-nowrap text-[11px] sm:text-sm font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition shadow-sm">
             <span class="sm:hidden">+ Abastecer</span><span class="hidden sm:inline">+ Abastecimento</span>
           </button>
         </div>
@@ -125,11 +126,11 @@
         <div class="flex flex-wrap items-end gap-3">
           <div>
             <label for="dashVehicle" class="block text-[11px] font-medium text-slate-500 mb-1">Veículo</label>
-            <select id="dashVehicle" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+            <select id="dashVehicle" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"></select>
           </div>
           <div>
             <label for="dashPeriod" class="block text-[11px] font-medium text-slate-500 mb-1">Atalho de período</label>
-            <select id="dashPeriod" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <select id="dashPeriod" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
               <option value="all">Todo o histórico</option>
               <option value="2026">2026</option>
               <option value="2025">2025</option>
@@ -141,11 +142,11 @@
           </div>
           <div>
             <label for="dashDateStart" class="block text-[11px] font-medium text-slate-500 mb-1">Data inicial</label>
-            <input id="dashDateStart" type="date" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input id="dashDateStart" type="date" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500" />
           </div>
           <div>
             <label for="dashDateEnd" class="block text-[11px] font-medium text-slate-500 mb-1">Data final</label>
-            <input id="dashDateEnd" type="date" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input id="dashDateEnd" type="date" class="text-sm rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500" />
           </div>
         </div>
         <div class="text-xs text-slate-500 pb-1">
@@ -169,7 +170,7 @@
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
           <p class="text-xs font-medium text-slate-500">Total Abastecido</p>
           <p id="kpiTotalSpent" class="text-2xl font-bold text-slate-900 mt-1">R$ --</p>
-          <p id="kpiDoBolso" class="text-xs font-semibold text-indigo-600 mt-1">Do bolso: R$ --</p>
+          <p id="kpiDoBolso" class="text-xs font-semibold text-sky-600 mt-1">Do bolso: R$ --</p>
           <p id="kpiTotalLiters" class="text-xs text-slate-500 mt-0.5">-- L em -- abastec.</p>
         </div>
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
@@ -178,7 +179,7 @@
             <p id="kpiLastFill" class="text-2xl font-bold text-slate-900 mt-1">--</p>
             <p id="kpiLastFillSub" class="text-xs text-slate-500 mt-1">--</p>
           </div>
-          <button type="button" id="btnGoCalcFromDash" class="text-left text-xs font-semibold text-indigo-600 hover:text-indigo-800 mt-2">
+          <button type="button" id="btnGoCalcFromDash" class="text-left text-xs font-semibold text-sky-600 hover:text-sky-800 mt-2">
             Simular paridade por trajeto &rarr;
           </button>
         </div>
@@ -215,9 +216,9 @@
           <span class="text-[11px] text-slate-500">Resumo do período selecionado</span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 text-xs">
-          <div class="p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-200">
-            <p class="text-indigo-700 font-medium">Efetivo (Do Bolso)</p>
-            <p id="finDoBolso" class="text-sm font-bold text-indigo-700 mt-0.5">R$ --</p>
+          <div class="p-2.5 rounded-lg bg-sky-50/70 border border-sky-200">
+            <p class="text-sky-700 font-medium">Efetivo (Do Bolso)</p>
+            <p id="finDoBolso" class="text-sm font-bold text-sky-700 mt-0.5">R$ --</p>
           </div>
           <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
             <p class="text-slate-500">Crédito</p>
@@ -255,7 +256,7 @@
               <span class="text-[11px] text-slate-500">Somente ciclos com tanque cheio</span>
             </div>
             <div class="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50 text-[11px] font-medium">
-              <button type="button" id="btnConsMonthly" class="px-2 py-1 rounded-md bg-white text-indigo-700 shadow-xs">Mensal</button>
+              <button type="button" id="btnConsMonthly" class="px-2 py-1 rounded-md bg-white text-sky-700 shadow-xs">Mensal</button>
               <button type="button" id="btnConsDetailed" class="px-2 py-1 rounded-md text-slate-600">Por ciclo</button>
             </div>
           </div>
@@ -281,7 +282,7 @@
             <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-teal-600 shrink-0"></span>Etanol Adit. (R$)</span>
             <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-amber-500 shrink-0"></span>Gasolina (R$)</span>
             <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-orange-600 shrink-0"></span>Gasolina Adit. (R$)</span>
-            <span class="inline-flex items-center gap-1.5 col-span-2 sm:col-span-1"><span class="w-3 h-0.5 bg-indigo-600 shrink-0"></span>Do Bolso (R$)</span>
+            <span class="inline-flex items-center gap-1.5 col-span-2 sm:col-span-1"><span class="w-3 h-0.5 bg-sky-600 shrink-0"></span>Do Bolso (R$)</span>
           </div>
         </div>
       </div>
@@ -321,7 +322,7 @@
         <div>
           <p class="text-xs font-semibold text-slate-600 mb-2">1. Escolha o cenário / trajeto desejado:</p>
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5" id="calcScenarioGrid">
-            <button type="button" data-scenario="cidadeSemAr" class="calc-scen-btn text-left p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/70 transition">
+            <button type="button" data-scenario="cidadeSemAr" class="calc-scen-btn text-left p-3 rounded-xl border-2 border-sky-600 bg-sky-50/70 transition">
               <p class="text-xs font-bold text-slate-900">Cidade • Sem Ar</p>
               <p class="text-[11px] text-slate-600 mt-1" id="scenLabel-cidadeSemAr">Etanol: -- | Gas: --</p>
             </button>
@@ -356,7 +357,7 @@
           </div>
           <div>
             <label for="calcDistance" class="block text-xs font-medium text-slate-600 mb-1">Distância do trajeto (km)</label>
-            <input id="calcDistance" type="number" step="1" min="1" value="100" class="w-full text-sm rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input id="calcDistance" type="number" step="1" min="1" value="100" class="w-full text-sm rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500" />
           </div>
         </div>
 
@@ -388,7 +389,7 @@
             </div>
             <div>
               <p class="text-slate-500">Etanol empata até</p>
-              <p id="calcResMaxEtanol" class="text-sm font-bold text-indigo-700 mt-0.5">R$ -- / L</p>
+              <p id="calcResMaxEtanol" class="text-sm font-bold text-sky-700 mt-0.5">R$ -- / L</p>
               <p id="calcResSavings" class="text-[11px] text-slate-500">Economia: --</p>
             </div>
           </div>
@@ -402,7 +403,7 @@
             <h3 class="text-sm font-bold text-slate-900">Perfil de Consumo Cadastrado do Veículo (km/L)</h3>
             <p class="text-xs text-slate-500">Cadastre o consumo real do carro em cada situação para substituir a regra genérica dos 70%.</p>
           </div>
-          <button type="button" id="btnSaveProfileCalc" class="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
+          <button type="button" id="btnSaveProfileCalc" class="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition">
             Salvar perfil no veículo
           </button>
         </div>
@@ -454,17 +455,17 @@
       <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2 flex-1 min-w-[200px]">
-            <input id="filterSearch" type="text" placeholder="Buscar posto, combustível, anotações..." class="w-full text-sm rounded-lg border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input id="filterSearch" type="text" placeholder="Buscar posto, combustível, anotações..." class="w-full text-sm rounded-lg border border-slate-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-500" />
             <button id="btnToggleFilters" type="button" class="whitespace-nowrap text-xs sm:text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
               <span>Filtros</span>
-              <span id="activeFilterCount" class="hidden px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-indigo-600 text-white">0</span>
+              <span id="activeFilterCount" class="hidden px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-sky-600 text-white">0</span>
             </button>
           </div>
           <div class="flex items-center gap-2">
             <button id="btnExportCsv" type="button" class="text-xs sm:text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
               Exportar CSV
             </button>
-            <button id="btnNewFuel" type="button" class="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
+            <button id="btnNewFuel" type="button" class="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition">
               + Novo
             </button>
           </div>
@@ -548,7 +549,7 @@
         <div>
           <h2 class="text-base font-semibold text-slate-900">Veículos Cadastrados</h2>
         </div>
-        <button id="btnNewVehicle" type="button" class="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
+        <button id="btnNewVehicle" type="button" class="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition">
           + Novo Veículo
         </button>
       </div>
@@ -616,11 +617,11 @@
           </div>
           <div class="flex flex-col gap-2 pt-1 sm:pt-5">
             <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-medium cursor-pointer">
-              <input id="fuelFull" type="checkbox" class="w-4 h-4 text-indigo-600 rounded border-slate-300" />
+              <input id="fuelFull" type="checkbox" class="w-4 h-4 text-sky-600 rounded border-slate-300" />
               <span>Tanque cheio</span>
             </label>
             <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-medium cursor-pointer">
-              <input id="fuelAditivo" type="checkbox" class="w-4 h-4 text-indigo-600 rounded border-slate-300" />
+              <input id="fuelAditivo" type="checkbox" class="w-4 h-4 text-sky-600 rounded border-slate-300" />
               <span>Aplicado aditivo</span>
             </label>
           </div>
@@ -680,7 +681,7 @@
           </button>
           <div class="flex items-center gap-2 ml-auto">
             <button type="button" id="btnCancelFuel" class="text-xs sm:text-sm font-medium px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">Cancelar</button>
-            <button type="submit" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">Salvar</button>
+            <button type="submit" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700">Salvar</button>
           </div>
         </div>
       </form>
@@ -715,7 +716,7 @@
         </div>
         <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
           <button type="button" id="btnCancelVehicle" class="text-xs sm:text-sm font-medium px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">Cancelar</button>
-          <button type="submit" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">Salvar</button>
+          <button type="submit" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700">Salvar</button>
         </div>
       </form>
     </div>
@@ -740,7 +741,7 @@
         <p class="text-[11px] text-slate-500">Esses dados ficam salvos apenas neste aparelho para autenticar na sua planilha.</p>
         <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
           <button type="button" id="btnCancelApiConfig" class="text-xs sm:text-sm font-medium px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">Cancelar</button>
-          <button type="submit" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">Salvar e Conectar</button>
+          <button type="submit" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700">Salvar e Conectar</button>
         </div>
       </form>
     </div>
@@ -749,7 +750,7 @@
   <!-- Loading Overlay -->
   <div id="loadingOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl px-5 py-4 shadow-xl border border-slate-200 flex items-center gap-3">
-      <div class="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      <div class="w-5 h-5 border-2 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
       <span id="loadingText" class="text-sm font-medium text-slate-800">Sincronizando com a planilha...</span>
     </div>
   </div>
@@ -757,7 +758,7 @@
   <!-- Toast -->
     <!-- Mobile Bottom Navigation -->
   <nav class="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 grid grid-cols-4 h-16 shadow-lg" aria-label="Navegação móvel">
-    <button type="button" class="mob-tab-btn flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-indigo-600" data-tab="dashboard" aria-selected="true">
+    <button type="button" class="mob-tab-btn flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-sky-600" data-tab="dashboard" aria-selected="true">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
       <span>Dashboard</span>
     </button>
@@ -1088,7 +1089,7 @@
       document.querySelectorAll('.pay-chip').forEach(btn => {
         const active = selectedPayMethods.has(btn.dataset.pay);
         btn.className = active
-          ? 'pay-chip px-2.5 py-1 rounded-full text-xs font-semibold border border-indigo-600 bg-indigo-600 text-white transition'
+          ? 'pay-chip px-2.5 py-1 rounded-full text-xs font-semibold border border-sky-600 bg-sky-600 text-white transition'
           : 'pay-chip px-2.5 py-1 rounded-full text-xs font-medium border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition';
       });
 
@@ -1380,7 +1381,7 @@
         data: {
           labels: mLabels,
           datasets: [
-            { label: 'Do Bolso (R$)', type: 'line', data: mKeys.map(k => Number(monthMap.get(k).doBolso.toFixed(2))), borderColor: '#4f46e5', backgroundColor: '#4f46e5', borderWidth: 2.5, pointRadius: 3, tension: 0.25, order: 0 },
+            { label: 'Do Bolso (R$)', type: 'line', data: mKeys.map(k => Number(monthMap.get(k).doBolso.toFixed(2))), borderColor: isDarkActive() ? '#38bdf8' : '#0284c7', backgroundColor: isDarkActive() ? '#38bdf8' : '#0284c7', borderWidth: 2.5, pointRadius: 3, tension: 0.25, order: 0 },
             { label: 'Etanol (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Etanol'].toFixed(2))), backgroundColor: '#10b981', borderRadius: 4, maxBarThickness: 48, stack: 'fuel', order: 1 },
             { label: 'Etanol Aditivado (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Etanol Aditivado'].toFixed(2))), backgroundColor: '#0d9488', borderRadius: 4, maxBarThickness: 48, stack: 'fuel', order: 1 },
             { label: 'Gasolina (R$)', data: mKeys.map(k => Number(monthMap.get(k)['Gasolina'].toFixed(2))), backgroundColor: '#f59e0b', borderRadius: 4, maxBarThickness: 48, stack: 'fuel', order: 1 },
@@ -1487,7 +1488,7 @@
         const isSel = btn.dataset.scenario === activeScenario;
         const baseSpan = '';
         btn.className = isSel
-          ? `calc-scen-btn ${baseSpan}text-left p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/70 transition`
+          ? `calc-scen-btn ${baseSpan}text-left p-3 rounded-xl border-2 border-sky-600 bg-sky-50/70 transition`
           : `calc-scen-btn ${baseSpan}text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition`;
       });
 
@@ -1638,17 +1639,17 @@
 
         // Desktop table row
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-indigo-50/50 cursor-pointer transition';
+        tr.className = 'hover:bg-sky-50/50 cursor-pointer transition';
         tr.addEventListener('click', () => openFuelModal(r));
         tr.innerHTML = `
           <td class="py-2.5 px-3 whitespace-nowrap font-medium text-slate-900">${fmtDateBR(r.data)}</td>
           <td class="py-2.5 px-3 whitespace-nowrap text-slate-700">${escapeHtml(r.posto || '—')}</td>
-          <td class="py-2.5 px-3 whitespace-nowrap"><span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${pillClass}">${r.combustivel}</span>${r.aditivo ? ` <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-100 text-indigo-800">+Adit${r.aditivoQual ? ': ' + escapeHtml(r.aditivoQual) : ''}</span>` : ''}</td>
+          <td class="py-2.5 px-3 whitespace-nowrap"><span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${pillClass}">${r.combustivel}</span>${r.aditivo ? ` <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-sky-100 text-sky-800">+Adit${r.aditivoQual ? ': ' + escapeHtml(r.aditivoQual) : ''}</span>` : ''}</td>
           <td class="py-2.5 px-3 text-right whitespace-nowrap">${r.km.toLocaleString('pt-BR')} km</td>
           <td class="py-2.5 px-3 text-right whitespace-nowrap">${fmtNum(r.litros, 3)} L</td>
           <td class="py-2.5 px-3 text-right whitespace-nowrap">${fmtNum(r.valorUnitario, 2)}</td>
           <td class="py-2.5 px-3 text-right whitespace-nowrap font-semibold text-slate-900">${fmtBRL(r.valorTotal)}</td>
-          <td class="py-2.5 px-3 text-right whitespace-nowrap font-medium ${seg ? 'text-indigo-700' : 'text-slate-400'}">${seg ? fmtNum(seg.kmL, 2) + ' km/L' : '—'}</td>
+          <td class="py-2.5 px-3 text-right whitespace-nowrap font-medium ${seg ? 'text-sky-700' : 'text-slate-400'}">${seg ? fmtNum(seg.kmL, 2) + ' km/L' : '—'}</td>
           <td class="py-2.5 px-3 whitespace-nowrap">${r.tanqueCheio ? 'Sim' : '<span class="text-slate-400">Não</span>'}</td>
           <td class="py-2.5 px-3 text-slate-600 max-w-xs truncate">${escapeHtml(snippet)}</td>
         `;
@@ -1656,13 +1657,13 @@
 
         // Mobile card
         const card = document.createElement('div');
-        card.className = 'bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm active:bg-indigo-50/50 cursor-pointer space-y-2';
+        card.className = 'bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm active:bg-sky-50/50 cursor-pointer space-y-2';
         card.addEventListener('click', () => openFuelModal(r));
         card.innerHTML = `
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${pillClass}">${r.combustivel}</span>
-              ${r.aditivo ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-100 text-indigo-800">+Adit${r.aditivoQual ? ': ' + escapeHtml(r.aditivoQual) : ''}</span>` : ''}
+              ${r.aditivo ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-sky-100 text-sky-800">+Adit${r.aditivoQual ? ': ' + escapeHtml(r.aditivoQual) : ''}</span>` : ''}
               <span class="text-xs font-medium text-slate-600">${fmtDateBR(r.data)}</span>
             </div>
             <span class="text-sm font-bold text-slate-900">${fmtBRL(r.valorTotal)}</span>
@@ -1678,7 +1679,7 @@
             </div>
             <div class="text-right">
               <p class="text-[10px] text-slate-400">${r.tanqueCheio ? 'Tanque cheio' : 'Parcial'}</p>
-              <p class="font-bold ${seg ? 'text-indigo-700' : 'text-slate-400'}">${seg ? fmtNum(seg.kmL, 2) + ' km/L' : '—'}</p>
+              <p class="font-bold ${seg ? 'text-sky-700' : 'text-slate-400'}">${seg ? fmtNum(seg.kmL, 2) + ' km/L' : '—'}</p>
             </div>
           </div>
           ${(r.posto || r.pagIfood || r.pagGift || r.descontoApp || r.cashback) ? `<p class="text-[11px] text-slate-500 truncate pt-1 border-t border-slate-100">${r.posto ? '<strong>' + escapeHtml(r.posto) + '</strong>' : ''}${r.pagIfood ? ' • iFood ' + fmtBRL(r.pagIfood) : ''}${r.pagGift ? ' • Gift ' + fmtBRL(r.pagGift) : ''}${(r.descontoApp || r.cashback) ? ' • Desc ' + fmtBRL((r.descontoApp || 0) + (r.cashback || 0)) : ''}</p>` : ''}
@@ -1710,7 +1711,7 @@
           <div class="flex items-center justify-between">
             <div>
               <h3 class="text-base font-bold text-slate-900">${escapeHtml(v.modelo)} (${escapeHtml(String(v.ano))})</h3>
-              <p class="text-xs font-semibold text-indigo-600">${escapeHtml(v.placa)}</p>
+              <p class="text-xs font-semibold text-sky-600">${escapeHtml(v.placa)}</p>
             </div>
             <span class="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-medium">${abast.length} abastecimentos</span>
           </div>
@@ -1726,7 +1727,7 @@
           </div>
           <div class="text-xs pt-2 border-t border-slate-100 flex items-center justify-between">
             <span class="text-slate-500">${hasProfile ? 'Perfil de consumo cadastrado' : 'Perfil de consumo pendente'}</span>
-            <button type="button" class="text-indigo-600 font-semibold hover:underline" data-edit-profile="${escapeHtml(v.placa)}">Configurar consumo &rarr;</button>
+            <button type="button" class="text-sky-600 font-semibold hover:underline" data-edit-profile="${escapeHtml(v.placa)}">Configurar consumo &rarr;</button>
           </div>
           ${v.obs ? `<p class="text-xs text-slate-500">${escapeHtml(v.obs)}</p>` : ''}
         `;
@@ -1747,7 +1748,7 @@
       document.querySelectorAll('.mob-tab-btn').forEach(btn => {
         const active = btn.dataset.tab === tabName;
         btn.setAttribute('aria-selected', active ? 'true' : 'false');
-        btn.classList.toggle('text-indigo-600', active);
+        btn.classList.toggle('text-sky-600', active);
         btn.classList.toggle('text-slate-500', !active);
       });
       ['dashboard', 'calculadora', 'abastecimentos', 'veiculos'].forEach(t => {
@@ -2116,13 +2117,13 @@
     document.getElementById('btnGoCalcFromDash').addEventListener('click', () => switchTab('calculadora'));
     document.getElementById('btnConsMonthly').addEventListener('click', () => {
       consumptionMode = 'monthly';
-      document.getElementById('btnConsMonthly').className = 'px-2 py-1 rounded-md bg-white text-indigo-700 shadow-xs';
+      document.getElementById('btnConsMonthly').className = 'px-2 py-1 rounded-md bg-white text-sky-700 shadow-xs';
       document.getElementById('btnConsDetailed').className = 'px-2 py-1 rounded-md text-slate-600';
       renderDashboard();
     });
     document.getElementById('btnConsDetailed').addEventListener('click', () => {
       consumptionMode = 'detailed';
-      document.getElementById('btnConsDetailed').className = 'px-2 py-1 rounded-md bg-white text-indigo-700 shadow-xs';
+      document.getElementById('btnConsDetailed').className = 'px-2 py-1 rounded-md bg-white text-sky-700 shadow-xs';
       document.getElementById('btnConsMonthly').className = 'px-2 py-1 rounded-md text-slate-600';
       renderDashboard();
     });
