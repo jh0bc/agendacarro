@@ -1740,7 +1740,11 @@
       }
     }
 
+    const TAB_ORDER = ['dashboard', 'calculadora', 'abastecimentos', 'veiculos'];
+    let currentTab = 'dashboard';
+
     function switchTab(tabName) {
+      currentTab = tabName;
       document.querySelectorAll('.tab-btn').forEach(btn => {
         const active = btn.dataset.tab === tabName;
         btn.setAttribute('aria-selected', active ? 'true' : 'false');
@@ -2237,6 +2241,39 @@
         if (themeMode === 'system') applyTheme(true);
       });
     }
+
+
+    // Navegação por gesto (arrastar o dedo) na barra inferior e na área principal (ignorando gráficos/inputs/scroll horizontal)
+    (function setupMobileSwipe() {
+      let startX = 0, startY = 0, ignoreSwipe = false;
+      function onStart(e, isBottomBar) {
+        if (!e.touches || e.touches.length !== 1) return;
+        const t = e.target;
+        ignoreSwipe = !isBottomBar && Boolean(t.closest('canvas, input, select, textarea, .overflow-x-auto'));
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }
+      function onEnd(e) {
+        if (ignoreSwipe || !e.changedTouches || e.changedTouches.length !== 1) return;
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+        const idx = TAB_ORDER.indexOf(currentTab);
+        if (idx < 0) return;
+        if (dx < 0 && idx < TAB_ORDER.length - 1) switchTab(TAB_ORDER[idx + 1]);
+        else if (dx > 0 && idx > 0) switchTab(TAB_ORDER[idx - 1]);
+      }
+      const mainEl = document.querySelector('main');
+      const mobNav = document.querySelector('nav[aria-label="Navegação móvel"]');
+      if (mainEl) {
+        mainEl.addEventListener('touchstart', (e) => onStart(e, false), { passive: true });
+        mainEl.addEventListener('touchend', onEnd, { passive: true });
+      }
+      if (mobNav) {
+        mobNav.addEventListener('touchstart', (e) => onStart(e, true), { passive: true });
+        mobNav.addEventListener('touchend', onEnd, { passive: true });
+      }
+    })();
 
     // Init
     applyTheme(false);
