@@ -898,6 +898,10 @@
       state = ensureProfiles(serverData || { veiculos: [], abastecimentos: [] });
       state.abastecimentos.forEach(r => {
         if (r.valorUnitario > 100) r.valorUnitario = Number((r.valorUnitario / 1000).toFixed(2));
+        if (!(r.valorUnitario > 0) && r.litros > 0) {
+          const base = Number(r.valorBomba || r.valorTotal || 0);
+          if (base > 0) r.valorUnitario = Number((base / r.litros).toFixed(2));
+        }
       });
       saveState();
       populateVehicleSelects();
@@ -932,6 +936,10 @@
           if (parsed && Array.isArray(parsed.abastecimentos) && Array.isArray(parsed.veiculos)) {
             parsed.abastecimentos.forEach(r => {
               if (r.valorUnitario > 100) r.valorUnitario = Number((r.valorUnitario / 1000).toFixed(2));
+              if (!(r.valorUnitario > 0) && r.litros > 0) {
+                const base = Number(r.valorBomba || r.valorTotal || 0);
+                if (base > 0) r.valorUnitario = Number((base / r.litros).toFixed(2));
+              }
             });
             return ensureProfiles(parsed);
           }
