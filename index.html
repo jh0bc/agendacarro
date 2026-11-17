@@ -811,7 +811,25 @@
 
     let state = loadState();
     let charts = { consumption: null, monthly: null, price: null };
-    let activeScenario = 'cidadeSemAr';
+    const CALC_PREFS_KEY = 'agendacarro_calc_prefs_v1';
+    function loadCalcPrefs() {
+      try {
+        const raw = localStorage.getItem(CALC_PREFS_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return {};
+    }
+    function saveCalcPrefs() {
+      try {
+        localStorage.setItem(CALC_PREFS_KEY, JSON.stringify({
+          scenario: activeScenario,
+          priceEtanol: document.getElementById('calcPriceEtanol').value,
+          priceGas: document.getElementById('calcPriceGas').value,
+          distance: document.getElementById('calcDistance').value
+        }));
+      } catch (e) {}
+    }
+    let activeScenario = loadCalcPrefs().scenario || 'cidadeSemAr';
     let consumptionMode = 'monthly';
     let editedOrder = [];
 
@@ -1452,13 +1470,25 @@
         document.getElementById(`prof_${sc.key}_et`).value = p.etanol;
         document.getElementById(`prof_${sc.key}_gas`).value = p.gasolina;
       }
+      const prefs = loadCalcPrefs();
       if (!document.getElementById('calcPriceEtanol').value) {
-        const lastEt = [...state.abastecimentos].reverse().find(r => r.placa === v.placa && fuelFamily(r.combustivel) === 'Etanol');
-        if (lastEt) document.getElementById('calcPriceEtanol').value = lastEt.valorUnitario.toFixed(2);
+        if (prefs.priceEtanol) {
+          document.getElementById('calcPriceEtanol').value = prefs.priceEtanol;
+        } else {
+          const lastEt = [...state.abastecimentos].reverse().find(r => r.placa === v.placa && fuelFamily(r.combustivel) === 'Etanol');
+          if (lastEt) document.getElementById('calcPriceEtanol').value = lastEt.valorUnitario.toFixed(2);
+        }
       }
       if (!document.getElementById('calcPriceGas').value) {
-        const lastGas = [...state.abastecimentos].reverse().find(r => r.placa === v.placa && fuelFamily(r.combustivel) === 'Gasolina');
-        if (lastGas) document.getElementById('calcPriceGas').value = lastGas.valorUnitario.toFixed(2);
+        if (prefs.priceGas) {
+          document.getElementById('calcPriceGas').value = prefs.priceGas;
+        } else {
+          const lastGas = [...state.abastecimentos].reverse().find(r => r.placa === v.placa && fuelFamily(r.combustivel) === 'Gasolina');
+          if (lastGas) document.getElementById('calcPriceGas').value = lastGas.valorUnitario.toFixed(2);
+        }
+      }
+      if (prefs.distance && document.getElementById('calcDistance').value === '100') {
+        document.getElementById('calcDistance').value = prefs.distance;
       }
       updateCalcDisplay();
     }
@@ -2201,11 +2231,15 @@
     document.querySelectorAll('.calc-scen-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         activeScenario = btn.dataset.scenario;
+        saveCalcPrefs();
         updateCalcDisplay();
       });
     });
     ['calcPriceEtanol', 'calcPriceGas', 'calcDistance'].forEach(id => {
-      document.getElementById(id).addEventListener('input', updateCalcDisplay);
+      document.getElementById(id).addEventListener('input', () => {
+        saveCalcPrefs();
+        updateCalcDisplay();
+      });
     });
     document.querySelectorAll('.prof-input').forEach(inp => {
       inp.addEventListener('input', updateCalcDisplay);
